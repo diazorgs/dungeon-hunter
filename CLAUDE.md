@@ -22,7 +22,9 @@ This is a pnpm monorepo driven by the Vite+ CLI `vp`, which wraps Vite, Vitest, 
 - `vp run ready`: run everything CI should run (check, then all tests, then all builds).
 - `vp run <pkg>#<task>` targets one package, e.g. `vp run @dh/web#dev`.
 - `vp <cmd>` is a built-in command; `vp run <name>` runs a `package.json` script. They can differ, e.g. `vp dev` vs `vp run dev`.
-- Known bug: the root `dev` script runs `vp run website#dev`, but no `website` package exists (the web package is `@dh/web`). Plan 01 fixes this. Until then, start the apps separately: `vp run @dh/web#dev` (port 5173) and `vp run @dh/api#dev` (Wrangler).
+- `vp run dev` starts web (5173) and api (8787, Wrangler) in parallel.
+- All lint config lives in the root `vite.config.ts` (`lint.overrides` per folder). `vp check` ignores package-level `lint` blocks.
+- If `vp` is not on PATH in a non-interactive shell, it lives at `~/.local/share/vite-plus/bin`.
 - The pre-commit hook (`.vite-hooks/pre-commit`) runs `vp staged`, which runs `vp check --fix` on staged files.
 
 Tests import from `vite-plus/test`, never from `vitest`. The lint rule `vite-plus/prefer-vite-plus-imports` is set to error.

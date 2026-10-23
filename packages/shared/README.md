@@ -1,23 +1,3 @@
-# vite-plus-starter
+# @dh/shared
 
-A starter for creating a Vite Plus project.
-
-## Development
-
-- Install dependencies:
-
-```bash
-vp install
-```
-
-- Run the unit tests:
-
-```bash
-vp test
-```
-
-- Build the library:
-
-```bash
-vp pack
-```
+Internal package, consumed from source (DESIGN.md §2.3). Run `vp test` here.

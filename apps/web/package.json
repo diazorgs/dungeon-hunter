@@ -7,10 +7,12 @@
     "dev": "vp dev",
     "build": "tsc -b && vp build",
     "lint": "vp lint .",
-    "preview": "vp preview"
+    "preview": "vp preview",
+    "test": "vp test"
   },
   "dependencies": {
     "@dh/shared": "workspace:^",
+    "@dh/utils": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-query": "catalog:",
     "hono": "catalog:",

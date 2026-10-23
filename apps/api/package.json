@@ -7,19 +7,24 @@
     }
   },
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --port 8787",
     "deploy": "wrangler deploy --minify",
+    "test": "vp test",
+    "typecheck": "tsc --noEmit",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
     "@dh/shared": "workspace:^",
+    "@dh/utils": "workspace:*",
     "@hono/zod-validator": "catalog:",
     "@supabase/supabase-js": "catalog:",
-    "hono": "^4.13.13",
+    "hono": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
     "wrangler": "catalog:"
   }
 }

@@ -6,7 +6,9 @@
     "strict": true,
     "skipLibCheck": true,
     "lib": ["ESNext"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "types": ["@cloudflare/workers-types"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "verbatimModuleSyntax": true
   }
 }

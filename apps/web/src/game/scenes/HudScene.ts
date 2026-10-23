@@ -18,10 +18,10 @@ export class HudScene extends Phaser.Scene {
 
   // shortcut: placeholder text readout; plan 11 replaces it with bars and the cooldown ring.
   update(time: number) {
-    const rig = (this.scene.get(SceneKey.Dungeon) as DungeonScene).rig;
-    if (!rig) return;
-    const c = rig.player.combat;
-    const cd = rig.skills.cooldown.remaining(time);
+    const world = (this.scene.get(SceneKey.Dungeon) as DungeonScene).world;
+    if (!world) return;
+    const c = world.player.combat;
+    const cd = world.skills.cooldown.remaining(time);
     this.text.setText(
       `HP ${c.hp}/${c.maxHp}  SH ${c.shield}/${c.maxShield}  EN ${c.energy}\n` +
         `SKILL ${cd > 0 ? `${Math.ceil(cd / 1000)}s` : "ready"}`,

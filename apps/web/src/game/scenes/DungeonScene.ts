@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { bus } from "../bridge/bus.ts";
 import { RUNNERS } from "@dh/shared";
 import type { RunConfig } from "../bridge/types.ts";
-import { RunnerRig } from "../systems/RunnerRig.ts";
+import { CombatWorld } from "../systems/CombatWorld.ts";
 import { InputSystem } from "../systems/InputSystem.ts";
 import { buildPlaceholderRoom } from "../systems/placeholderRoom.ts";
 import { SceneKey } from "./keys.ts";
@@ -13,7 +13,7 @@ export class DungeonScene extends Phaser.Scene {
   private runConfig!: RunConfig;
   private startedAt = 0;
   /** Read by the HUD scene. */
-  rig!: RunnerRig;
+  world!: CombatWorld;
 
   constructor() {
     super(SceneKey.Dungeon);
@@ -25,7 +25,7 @@ export class DungeonScene extends Phaser.Scene {
     this.cameras.main.setRoundPixels(true);
     const room = buildPlaceholderRoom(this, 15, 11);
     this.input$ = new InputSystem(this);
-    this.rig = new RunnerRig(this, RUNNERS[this.runConfig.runnerId], room.walls, {
+    this.world = new CombatWorld(this, RUNNERS[this.runConfig.runnerId], room.walls, {
       x: room.inner.centerX,
       y: room.inner.centerY,
     });
@@ -42,8 +42,8 @@ export class DungeonScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
-    const input = this.input$.read(this.cameras.main, this.rig.player);
-    this.rig.update(input, time, delta / 1000, this.runConfig.settings.aimMode);
+    const input = this.input$.read(this.cameras.main, this.world.player);
+    this.world.update(input, time, delta / 1000, this.runConfig.settings.aimMode);
     if (input.pause) {
       this.scene.launch(SceneKey.Pause, { from: SceneKey.Dungeon });
       this.scene.pause();

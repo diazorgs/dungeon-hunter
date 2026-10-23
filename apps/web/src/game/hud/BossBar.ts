@@ -42,6 +42,24 @@ export class BossBar {
     for (const m of this.markers) g.fillRect(this.x + Math.round(W * m), this.y - 1, 1, 6);
   }
 
+  /** 1.5 s name card in the middle of the screen. */
+  intro(scene: Phaser.Scene, name: string): void {
+    const { width, height } = scene.scale;
+    const card = hudText(scene, width / 2, height / 2 - 30, "#ff4fbf", 16)
+      .setOrigin(0.5)
+      .setText(name.toUpperCase());
+    const sub = hudText(scene, width / 2, height / 2 - 12, "#a9b8d1")
+      .setOrigin(0.5)
+      .setText("VIGIL: GUARDIAN ONLINE");
+    scene.tweens.add({
+      targets: [card, sub],
+      alpha: 0,
+      delay: 1100,
+      duration: 400,
+      onComplete: () => (card.destroy(), sub.destroy()),
+    });
+  }
+
   hide(): void {
     this.g.setVisible(false);
     this.name.setVisible(false);

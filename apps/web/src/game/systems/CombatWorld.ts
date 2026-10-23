@@ -7,6 +7,7 @@ import { AudioSystem } from "./AudioSystem.ts";
 import { Crosshair } from "./Crosshair.ts";
 import { DamageNumbers } from "./DamageNumbers.ts";
 import { JuiceSystem } from "./JuiceSystem.ts";
+import { BossSystem } from "./BossSystem.ts";
 import { BulletPool } from "./BulletPool.ts";
 import { GuardianSystem } from "./GuardianSystem.ts";
 import { createSkill, SkillSystem } from "./SkillSystem.ts";
@@ -23,6 +24,8 @@ export class CombatWorld {
   readonly guardians: GuardianSystem;
   readonly audio: AudioSystem;
   readonly juice: JuiceSystem;
+  readonly bosses: BossSystem;
+  readonly walls: Phaser.Types.Physics.Arcade.ArcadeColliderType;
   private readonly scene: Phaser.Scene;
   private readonly crosshair: Crosshair;
 
@@ -35,6 +38,7 @@ export class CombatWorld {
     blocked: (x: number, y: number) => boolean,
   ) {
     this.scene = scene;
+    this.walls = walls;
     this.player = new Player(scene, at.x, at.y, runner);
     this.skills = new SkillSystem(createSkill(runner));
     this.playerBullets = new BulletPool(scene, "player", 512);
@@ -60,6 +64,7 @@ export class CombatWorld {
       new DamageNumbers(scene, settings.damageNumbers),
     );
     this.crosshair = new Crosshair(scene);
+    this.bosses = new BossSystem(scene, this);
   }
 
   update(input: InputState, now: number, dt: number, aimMode: "soft" | "full"): void {
@@ -73,6 +78,7 @@ export class CombatWorld {
     this.skills.update(ctx, now, dt);
     this.weapons.update(input, now, dt);
     this.guardians.update(now, dt);
+    this.bosses.update(now, dt);
     this.playerBullets.update(now);
     this.enemyBullets.update(now);
   }

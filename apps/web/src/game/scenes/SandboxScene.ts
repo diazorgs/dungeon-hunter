@@ -76,6 +76,8 @@ export class SandboxScene extends Phaser.Scene {
       .forEach((id, i) =>
         this.world.guardians.spawn(id, room.inner.right - 24, room.inner.y + 24 + i * 20),
       );
+    for (const id of spawn.filter((x) => x.startsWith("boss:")))
+      this.world.bosses.start(id.slice(5) as "dummy", room.inner.centerX, room.inner.y + 24);
     const rand = () => ({
       x: Phaser.Math.Between(room.inner.x + 8, room.inner.right - 8),
       y: Phaser.Math.Between(room.inner.y + 8, room.inner.bottom - 8),

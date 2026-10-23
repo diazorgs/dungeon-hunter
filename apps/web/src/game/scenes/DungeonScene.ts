@@ -5,13 +5,13 @@ import { bus } from "../bridge/bus.ts";
 import type { RunConfig } from "../bridge/types.ts";
 import type { HudSource } from "../hud/HudSource.ts";
 import { roomAt } from "../logic/camera.ts";
-import { createRunState, endRun, tickTime } from "../logic/run/runState.ts";
+import { createRunState, endRun, onBossKilled, tickTime } from "../logic/run/runState.ts";
 import type { RunState } from "../logic/run/runState.ts";
 import { toRunResult, toRunSummary } from "../logic/run/summary.ts";
 import { LootSystem } from "../systems/LootSystem.ts";
 import { ModSystem } from "../systems/ModSystem.ts";
 import { MOD_IDS, modPool, validateRun } from "@dh/shared";
-import type { ModId } from "@dh/shared";
+import type { BossId, ModId, SectorId } from "@dh/shared";
 import type { Chest } from "../entities/Chest.ts";
 import { rollModChoices } from "../logic/mods/choices.ts";
 import type { HudScene } from "./HudScene.ts";
@@ -27,6 +27,11 @@ import { buildSector } from "../systems/SectorBuilder.ts";
 import { SceneKey } from "./keys.ts";
 
 const SECTOR = 1;
+const SECTOR_BOSS: Record<SectorId, BossId> = {
+  1: "gatekeeper",
+  2: "conduit-hydra",
+  3: "core-warden",
+};
 
 export class DungeonScene extends Phaser.Scene {
   private input$!: InputSystem;
@@ -94,6 +99,10 @@ export class DungeonScene extends Phaser.Scene {
       if (id) this.mods.apply(id);
       else chest.reclose();
     });
+    this.events.on("boss:room", (d: { x: number; y: number }) =>
+      this.world.bosses.start(SECTOR_BOSS[SECTOR], d.x, d.y),
+    );
+    this.events.on("boss:dead", (d: { id: BossId }) => onBossKilled(this.run, d.id));
     this.events.on("player:died", () => this.die());
     if (import.meta.env.DEV)
       Object.assign((window as unknown as { __dh: object }).__dh, {

@@ -29,6 +29,7 @@ export class EncounterSystem {
   private readonly cleared = new Set<number>();
   private current: number | null = null;
   private active: Active | null = null;
+  private bossRoom: number | null = null;
   private readonly scene: Phaser.Scene;
   private readonly guardians: GuardianSystem;
   private readonly doors: readonly Door[];
@@ -51,6 +52,14 @@ export class EncounterSystem {
     this.sectorId = opts.sectorId;
     this.seed = opts.seed;
     this.roomsClearedThisRun = opts.roomsClearedThisRun;
+    scene.events.on("boss:dead", () => {
+      if (this.bossRoom === null) return;
+      const id = this.bossRoom;
+      this.bossRoom = null;
+      this.cleared.add(id);
+      for (const d of this.roomDoors(id)) d.unlock();
+      this.scene.events.emit("room:cleared", { roomId: id, type: "boss" });
+    });
   }
 
   update(player: Player): void {
@@ -68,9 +77,10 @@ export class EncounterSystem {
   private enter(room: ComposedRoom, player: Player): void {
     this.scene.events.emit("room:entered", { roomId: room.id, type: room.type });
     if (this.cleared.has(room.id)) return;
-    // Doors lock only in combat rooms (and boss rooms once plan 14 lands).
+    if (room.type === "boss") return this.enterBoss(room, player);
+    // Doors lock only in combat and boss rooms.
     if (room.type !== "combat") {
-      if (room.type !== "boss") this.cleared.add(room.id);
+      this.cleared.add(room.id);
       return;
     }
     const rng = createRng(this.seed).fork(`spawns:s${this.sectorId}:r${room.id}`);
@@ -88,6 +98,17 @@ export class EncounterSystem {
     for (const d of this.roomDoors(room.id)) d.lock();
     this.pushOutOfDoors(player, room.id);
     this.scene.events.emit("room:locked", { roomId: room.id, type: room.type });
+  }
+
+  private enterBoss(room: ComposedRoom, player: Player): void {
+    if (this.bossRoom !== null) return;
+    const spawn = this.sector.spawns.find((s) => s.roomId === room.id && s.kind === "boss");
+    if (!spawn) throw new Error(`boss room ${room.id} has no boss spawn`);
+    this.bossRoom = room.id;
+    for (const d of this.roomDoors(room.id)) d.lock();
+    this.pushOutOfDoors(player, room.id);
+    this.scene.events.emit("room:locked", { roomId: room.id, type: room.type });
+    this.scene.events.emit("boss:room", { roomId: room.id, x: spawn.x, y: spawn.y });
   }
 
   private nextWave(player: Player): void {

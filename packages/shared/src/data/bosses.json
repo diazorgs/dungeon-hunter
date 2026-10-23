@@ -4,7 +4,34 @@
     "name": "Gatekeeper",
     "sector": 1,
     "hp": 400,
-    "phases": []
+    "phases": [
+      {
+        "id": "armoured",
+        "untilHpPct": 0.5,
+        "patterns": ["charge", "ring"]
+      },
+      {
+        "id": "enraged",
+        "untilHpPct": 0,
+        "patterns": ["double-charge", "ring"]
+      }
+    ],
+    "params": {
+      "contactDamage": 1,
+      "chargeTelegraphMs": 600,
+      "chargeSpeed": 260,
+      "chargeMaxMs": 1600,
+      "stunMs": 1500,
+      "armourMul": 0.5,
+      "stunnedMul": 1.5,
+      "doubleChargeGapMs": 400,
+      "ringTelegraphMs": 500,
+      "ringBullets": 16,
+      "ringSpeed": 80,
+      "ringCount": 3,
+      "ringGapMs": 250,
+      "ringRecoverMs": 700
+    }
   },
   {
     "id": "conduit-hydra",

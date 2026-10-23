@@ -78,6 +78,8 @@ export const BossSchema = z.object({
       patterns: z.array(z.string()),
     }),
   ),
+  /** Tunable numbers for the boss's attacks (speeds, timings, counts). */
+  params: z.record(z.string(), z.number()).default({}),
 });
 
 export const ModEffectSchema = z.discriminatedUnion("kind", [

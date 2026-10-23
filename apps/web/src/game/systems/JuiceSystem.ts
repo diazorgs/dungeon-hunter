@@ -1,7 +1,7 @@
 import { WEAPONS } from "@dh/shared";
 import type { Settings, WeaponId } from "@dh/shared";
 import Phaser from "phaser";
-import { scaledShake, shouldReplaceShake } from "../logic/juice.ts";
+import { createRateLimiter, scaledShake, shouldReplaceShake } from "../logic/juice.ts";
 import type { AudioSystem } from "./AudioSystem.ts";
 import type { DamageNumbers } from "./DamageNumbers.ts";
 
@@ -79,6 +79,28 @@ export class JuiceSystem {
       this.debris.explode(Phaser.Math.Between(8, 12), d.x, d.y);
       audio.play("sfx.enemy-death");
       if (d.elite) this.hitStop(HIT_STOP_MS);
+    });
+    const bossHitStop = createRateLimiter(120);
+    on("boss:hit", (d: { x: number; y: number; dmg: number; target: Tintable }) => {
+      this.flash(d.target);
+      this.sparks.explode(5, d.x, d.y);
+      numbers.show(d.x, d.y, d.dmg);
+      audio.play("sfx.hit");
+      if (bossHitStop(performance.now())) this.hitStop(HIT_STOP_MS);
+    });
+    on("boss:dead", (d: { x: number; y: number }) => {
+      for (let i = 0; i < 4; i++)
+        this.debris.explode(
+          12,
+          d.x + Phaser.Math.Between(-16, 16),
+          d.y + Phaser.Math.Between(-16, 16),
+        );
+      audio.play("sfx.enemy-death");
+      const s = scaledShake(
+        { shake: { intensity: 0.01, durationMs: 300 } },
+        this.settings.screenShake,
+      );
+      if (s) this.shakeCamera(s);
     });
     on("bullet:wall", (d: { x: number; y: number }) => this.sparks.explode(4, d.x, d.y));
     on("player:damaged", (d: { shieldLost: number; hpLost: number }) => {

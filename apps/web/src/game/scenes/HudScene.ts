@@ -90,6 +90,7 @@ export class HudScene extends Phaser.Scene {
         (d: { name: string; maxHp: number; phaseMarkers?: number[] }) =>
           this.bossBar.show(d.name, d.maxHp, d.phaseMarkers),
       ],
+      ["boss:intro", (d: { name: string }) => this.bossBar.intro(this, d.name)],
       ["boss:hp", (d: { hp: number }) => this.bossBar.update(d.hp)],
       ["boss:dead", () => this.bossBar.hide()],
       ["radio:say", (line: RadioLineIn) => this.radio.say(line)],

@@ -5,7 +5,10 @@ import type { RunConfig } from "../bridge/types.ts";
 import { isActive } from "../logic/combat/buffs.ts";
 import { parseDevParams } from "../logic/devParams.ts";
 import { InputSystem } from "../systems/InputSystem.ts";
-import { buildPlaceholderRoom } from "../systems/placeholderRoom.ts";
+import { loadedTemplates, TILES, TILESET_KEY } from "../content/rooms.ts";
+import { composeSector, TILE_PX, wallAt } from "../logic/dungeon/compose.ts";
+import { CameraDirector } from "../systems/CameraDirector.ts";
+import { buildSector } from "../systems/SectorBuilder.ts";
 import { CombatWorld } from "../systems/CombatWorld.ts";
 import { SceneKey } from "./keys.ts";
 
@@ -25,20 +28,40 @@ export class SandboxScene extends Phaser.Scene {
   create() {
     this.cameras.main.setRoundPixels(true);
     this.runConfig = this.registry.get("runConfig") as RunConfig;
-    const room = buildPlaceholderRoom(this, 15, 11);
-    // An inner pillar to test wall collision and line of sight.
-    room.walls.create(room.inner.centerX + 48, room.inner.centerY, "ph-wall").setDepth(10);
+    // One sealed combat room (its pillars test wall collision and line of sight).
+    const sector = composeSector(
+      {
+        seed: "SANDBOX0",
+        sector: 1,
+        attempts: 1,
+        edges: [],
+        rooms: [
+          { id: 0, gx: 2, gy: 2, type: "combat", doors: [], depth: 0, templateId: "combat-s1-01" },
+        ],
+      },
+      loadedTemplates(this.cache.json),
+      TILES,
+    );
+    const built = buildSector(this, sector, TILESET_KEY);
+    const w = sector.rooms[0]!.worldRect;
+    const room = {
+      inner: new Phaser.Geom.Rectangle(w.x + 16, w.y + 16, w.width - 32, w.height - 32),
+    };
+    this.physics.world.setBounds(0, 0, sector.widthTiles * TILE_PX, sector.heightTiles * TILE_PX);
+    new CameraDirector(
+      this.cameras.main,
+      sector.rooms,
+      sector.widthTiles * TILE_PX,
+      sector.heightTiles * TILE_PX,
+    ).update({ x: room.inner.centerX, y: room.inner.centerY }, 0);
     this.input$ = new InputSystem(this);
     this.world = new CombatWorld(
       this,
       RUNNERS[this.runConfig.runnerId],
       this.runConfig.settings,
-      room.walls,
-      {
-        x: room.inner.centerX,
-        y: room.inner.centerY,
-      },
-      room.blocked,
+      built.wallLayer,
+      { x: room.inner.centerX, y: room.inner.centerY },
+      (x, y) => wallAt(sector, x, y),
     );
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.input$.reset());
     this.world.player.god = parseDevParams(location.search).god ?? false;
@@ -68,6 +91,7 @@ export class SandboxScene extends Phaser.Scene {
     this.info = this.add
       .text(4, 4, "", { fontFamily: "monospace", fontSize: "8px", color: "#a9b8d1" })
       .setDepth(6000)
+      .setScrollFactor(0)
       .setResolution(4);
 
     const kb = this.input.keyboard!;

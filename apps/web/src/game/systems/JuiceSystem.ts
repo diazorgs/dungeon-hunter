@@ -93,6 +93,8 @@ export class JuiceSystem {
       } else audio.play("sfx.shield-break", { volume: 0.6 });
     });
     on("player:dashed", () => audio.play("sfx.dash"));
+    on("room:locked", () => audio.play("sfx.door-lock"));
+    on("room:cleared", () => audio.play("sfx.door-unlock"));
   }
 
   get hitStopped(): boolean {

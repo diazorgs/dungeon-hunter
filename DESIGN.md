@@ -114,6 +114,7 @@ dungeon-hunter/
 | One package's tests       | `vp test` inside the package, or `vp run @dh/web#test`                           |
 | One test file             | `vp test src/game/logic/combat/damage.test.ts` (inside the package)              |
 | Everything CI runs        | `vp run ready`                                                                   |
+| Rebuild room catalog      | `vp run @dh/web#rooms` (after editing Tiled rooms)                               |
 | Local DB                  | `pnpm exec supabase start` / `db reset` / `gen types` (scripts added in plan 24) |
 
 ---

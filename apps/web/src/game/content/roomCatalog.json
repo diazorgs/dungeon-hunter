@@ -1,0 +1,38 @@
+[
+  {
+    "id": "boss-s1",
+    "roomType": "boss",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "chest",
+    "roomType": "chest",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s1-01",
+    "roomType": "combat",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s1-02",
+    "roomType": "combat",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "log",
+    "roomType": "log",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "start",
+    "roomType": "start",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  }
+]

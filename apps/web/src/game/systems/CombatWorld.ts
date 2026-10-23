@@ -30,7 +30,7 @@ export class CombatWorld {
     scene: Phaser.Scene,
     runner: Runner,
     settings: Settings,
-    walls: Phaser.Physics.Arcade.StaticGroup,
+    walls: Phaser.Types.Physics.Arcade.ArcadeColliderType,
     at: Vec2,
     blocked: (x: number, y: number) => boolean,
   ) {
@@ -47,7 +47,7 @@ export class CombatWorld {
       walls,
       blocked,
     );
-    this.aim.setWalls(walls);
+    this.aim.setBlocked(blocked);
     this.aim.setTargetsProvider(() => this.guardians.targets());
     scene.physics.add.collider(this.player, walls);
     this.playerBullets.collideWith(walls);

@@ -83,6 +83,34 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
       f(PALETTE["amber-300"], 4, 4, 1, 1)
     ),
   ],
+  "ph-door-h": [
+    48,
+    16,
+    (_, f) => (
+      f(PALETTE["steel-600"], 0, 0, 48, 16),
+      f(PALETTE["amber-500"], 0, 6, 48, 4),
+      f(PALETTE["rust-700"], 0, 14, 48, 2)
+    ),
+  ],
+  "ph-door-v": [
+    16,
+    48,
+    (_, f) => (
+      f(PALETTE["steel-600"], 0, 0, 16, 48),
+      f(PALETTE["amber-500"], 6, 0, 4, 48),
+      f(PALETTE["rust-700"], 14, 0, 2, 48)
+    ),
+  ],
+  "ph-marker": [
+    12,
+    12,
+    (_, f) => (
+      f(PALETTE["bleed-500"], 2, 0, 8, 2),
+      f(PALETTE["bleed-500"], 2, 10, 8, 2),
+      f(PALETTE["bleed-500"], 0, 2, 2, 8),
+      f(PALETTE["bleed-500"], 10, 2, 2, 8)
+    ),
+  ],
   "ph-spark": [2, 2, (_, f) => f(PALETTE.white, 0, 0, 2, 2)],
   "ph-casing": [2, 1, (_, f) => f(PALETTE["amber-500"], 0, 0, 2, 1)],
   "ph-muzzle": [

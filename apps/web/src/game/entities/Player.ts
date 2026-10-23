@@ -27,6 +27,7 @@ const DASH_RECHARGE_MS = 600;
 /** The Runner: Arcade sprite wrapping pure combat state. Emits `player:dashed` on the scene. */
 export class Player extends Phaser.Physics.Arcade.Sprite {
   declare body: Phaser.Physics.Arcade.Body;
+  readonly runner: Runner;
   readonly combat: CombatantState;
   stats: PlayerStats;
   readonly buffs: ActiveBuffs = { until: {} };
@@ -46,6 +47,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     // Feet-only body (sprite 16×24) so walls clip feet, not heads.
     this.body.setSize(10, 8).setOffset(3, 16);
+    this.runner = runner;
     this.combat = createCombatant(runner);
     this.stats = deriveStats(runner, []);
     this.dash = new ChargePool(this.stats.dashCharges, DASH_RECHARGE_MS);

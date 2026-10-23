@@ -2,7 +2,9 @@ import { PALETTE, WEAPONS } from "@dh/shared";
 import type { WeaponId } from "@dh/shared";
 import Phaser from "phaser";
 import { BossBar } from "../hud/BossBar.ts";
+import { DashPips } from "../hud/DashPips.ts";
 import { FullMap } from "../hud/FullMap.ts";
+import { ModPick } from "../hud/ModPick.ts";
 import type { HudSource } from "../hud/HudSource.ts";
 import { Minimap } from "../hud/Minimap.ts";
 import { RadioBox } from "../hud/RadioBox.ts";
@@ -25,6 +27,8 @@ export class HudScene extends Phaser.Scene {
   private fullMap!: FullMap;
   private weapons!: WeaponSlots;
   private skill!: SkillRing;
+  private dash!: DashPips;
+  modPick!: ModPick;
   radio!: RadioBox;
   private bossBar!: BossBar;
   private vignette!: Vignette;
@@ -42,6 +46,8 @@ export class HudScene extends Phaser.Scene {
     this.minimap = new Minimap(this, width - 68, 4);
     this.weapons = new WeaponSlots(this, width - 60, height - 52);
     this.skill = new SkillRing(this, width - 52, height - 14);
+    this.dash = new DashPips(this, width - 60, height - 3);
+    this.modPick = new ModPick(this);
     this.radio = new RadioBox(this);
     this.bossBar = new BossBar(this);
     this.fullMap = new FullMap(this);
@@ -115,5 +121,6 @@ export class HudScene extends Phaser.Scene {
     );
     const cd = s.skills.cooldown;
     this.skill.update(cd.progress(now), cd.remaining(now) / 1000);
+    this.dash.update(s.player.dashCharges(now), s.player.stats.dashCharges);
   }
 }

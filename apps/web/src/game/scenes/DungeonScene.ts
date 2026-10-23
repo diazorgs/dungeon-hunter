@@ -9,7 +9,12 @@ import { createRunState, endRun, tickTime } from "../logic/run/runState.ts";
 import type { RunState } from "../logic/run/runState.ts";
 import { toRunResult, toRunSummary } from "../logic/run/summary.ts";
 import { LootSystem } from "../systems/LootSystem.ts";
-import { validateRun } from "@dh/shared";
+import { ModSystem } from "../systems/ModSystem.ts";
+import { MOD_IDS, modPool, validateRun } from "@dh/shared";
+import type { ModId } from "@dh/shared";
+import type { Chest } from "../entities/Chest.ts";
+import { rollModChoices } from "../logic/mods/choices.ts";
+import type { HudScene } from "./HudScene.ts";
 import { loadedTemplates, ROOM_CATALOG, TILES, TILESET_KEY } from "../content/rooms.ts";
 import { composeSector, TILE_PX, wallAt } from "../logic/dungeon/compose.ts";
 import { generateSector } from "../logic/dungeon/generate.ts";
@@ -27,6 +32,7 @@ export class DungeonScene extends Phaser.Scene {
   private input$!: InputSystem;
   private runConfig!: RunConfig;
   private loot!: LootSystem;
+  mods!: ModSystem;
   private ending = false;
   run!: RunState;
   private camDirector!: CameraDirector;
@@ -76,7 +82,24 @@ export class DungeonScene extends Phaser.Scene {
       roomsClearedThisRun: () => this.run.roomsCleared,
     });
     this.loot = new LootSystem(this, this.world, this.run, sector, SECTOR);
+    this.mods = new ModSystem(this, this.world.player, this.run, this.world.guardians);
+    const goldRng = createRng(seed).fork(`mods:gold:s${SECTOR}`);
+    this.events.on("chest:gold-opened", async (chest: Chest) => {
+      const choices = rollModChoices(
+        goldRng,
+        modPool(this.runConfig.unlockedModIds),
+        this.world.player.stats,
+      );
+      const id = await this.pickMod(choices, true);
+      if (id) this.mods.apply(id);
+      else chest.reclose();
+    });
     this.events.on("player:died", () => this.die());
+    if (import.meta.env.DEV)
+      Object.assign((window as unknown as { __dh: object }).__dh, {
+        giveMod: (id: ModId) =>
+          MOD_IDS.includes(id) ? this.mods.apply(id) : console.warn("unknown mod", id),
+      });
     this.visited.clear();
     this.events.on("room:entered", (d: { roomId: number }) => this.visited.add(d.roomId));
     const source: HudSource = {
@@ -113,6 +136,15 @@ export class DungeonScene extends Phaser.Scene {
       this.scene.launch(SceneKey.Pause, { from: SceneKey.Dungeon });
       this.scene.pause();
     }
+  }
+
+  /** Opens the HUD's mod cards; world input is blocked meanwhile (combat itself keeps running). */
+  async pickMod(choices: ModId[], cancellable: boolean): Promise<ModId | null> {
+    const hud = this.scene.get(SceneKey.Hud) as HudScene;
+    this.input$.blocked = true;
+    const id = await hud.modPick.open(choices, { cancellable, gold: cancellable });
+    this.input$.blocked = false;
+    return id;
   }
 
   /** Pause menu → Abandon (and F9 in DEV). */

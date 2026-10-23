@@ -23,6 +23,8 @@ export class InputSystem {
   private padPrev = new Set<number>();
   // Latched on keydown: Phaser's JustDown misses taps shorter than one frame (keyup clears it).
   private readonly pressed = new Set<EdgeKey>();
+  /** While a menu overlay is open the world gets a neutral InputState (aim still tracks). */
+  blocked = false;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -96,6 +98,20 @@ export class InputSystem {
     const pad = this.scene.input.gamepad?.pad1;
     if (pad?.connected) this.readPad(pad, state, playerPos);
     state.device = this.device;
+    if (this.blocked) {
+      this.pressed.clear();
+      return {
+        ...state,
+        move: { x: 0, y: 0 },
+        fire: false,
+        skill: false,
+        dash: false,
+        swap: false,
+        interact: false,
+        pause: false,
+        map: false,
+      };
+    }
     return state;
   }
 

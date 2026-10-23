@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import type { HitTarget } from "../systems/weapons/targets.ts";
 
 export interface BulletOpts {
   damage: number;
@@ -10,6 +11,10 @@ export interface BulletOpts {
   scale?: number;
   /** Stun applied on hit (Shock Baton style), ms. */
   stunMs?: number;
+  /** Called after this bullet damages a target (chain lightning). */
+  onHit?: (b: Bullet, target: HitTarget) => void;
+  /** Called once when the bullet dies for any reason (explosive shells). */
+  onDeath?: (b: Bullet) => void;
 }
 
 /** Pooled projectile; never constructed per shot (see BulletPool). */
@@ -25,6 +30,8 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
   dieAt = 0;
   /** Guardians already hit by this bullet, so piercing shots hit each target once. */
   readonly hitIds = new Set<number>();
+  onHit?: BulletOpts["onHit"];
+  private onDeath?: BulletOpts["onDeath"];
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, "ph-bullet-player");
@@ -42,6 +49,8 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
     this.pierceLeft = opts.pierce ?? 0;
     this.bouncesLeft = opts.bounces ?? 0;
     this.stunMs = opts.stunMs ?? 0;
+    this.onHit = opts.onHit;
+    this.onDeath = opts.onDeath;
     this.body.setBounce(this.bouncesLeft > 0 ? 1 : 0);
     this.dieAt = this.scene.time.now + (opts.lifetimeMs ?? 3000);
     this.hitIds.clear();
@@ -49,6 +58,10 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
   }
 
   kill(): void {
+    if (!this.active) return;
+    const onDeath = this.onDeath;
+    this.onDeath = undefined;
     this.disableBody(true, true);
+    onDeath?.(this);
   }
 }

@@ -12,6 +12,7 @@ import type { AiWorld } from "./ai/AiController.ts";
 import { getAi } from "./ai/registry.ts";
 import type { BulletPool } from "./BulletPool.ts";
 import type { HazardSystem } from "./HazardSystem.ts";
+import type { HitTarget } from "./weapons/targets.ts";
 import { BLEED } from "../logic/spawn/modifiers.ts";
 
 const TILE = 16;
@@ -103,6 +104,16 @@ export class GuardianSystem {
     return (this.group.getChildren() as Guardian[]).filter((g) => !g.health.dead);
   }
 
+  static asTarget(g: Guardian): HitTarget {
+    return {
+      id: g.uid,
+      x: g.x,
+      y: g.y,
+      radius: g.displayWidth / 2,
+      hit: (dmg, kb, angle, now, stunMs) => void g.takeHit(dmg, kb, angle, now, stunMs),
+    };
+  }
+
   targets(): AimTarget[] {
     return this.alive().map((g) => ({ id: g.uid, x: g.x, y: g.y, visible: true }));
   }
@@ -126,7 +137,9 @@ export class GuardianSystem {
       return;
     }
     b.hitIds.add(g.uid);
-    g.takeHit(b.damage, b.knockback, b.rotation, this.scene.time.now, b.stunMs);
+    // Explosive shells carry 0 damage: the blast does the work.
+    if (b.damage > 0) g.takeHit(b.damage, b.knockback, b.rotation, this.scene.time.now, b.stunMs);
+    b.onHit?.(b, GuardianSystem.asTarget(g));
     if (b.pierceLeft > 0) b.pierceLeft--;
     else b.kill();
   }

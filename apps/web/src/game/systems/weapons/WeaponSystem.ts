@@ -11,7 +11,9 @@ import type { FireClock } from "../../logic/weapons/fire.ts";
 import { activeWeapon, createLoadout, pickUp, swap } from "../../logic/weapons/loadout.ts";
 import type { BulletPool } from "../BulletPool.ts";
 import type { FireContext } from "./behaviours/Behaviour.ts";
-import { getBehaviour } from "./behaviours/registry.ts";
+import type { Behaviour } from "./behaviours/Behaviour.ts";
+import { createBehaviour } from "./behaviours/registry.ts";
+import type { CombatTargets } from "./targets.ts";
 
 const SWAP_DELAY_MS = 150;
 const MUZZLE_PX = 10;
@@ -27,11 +29,21 @@ export class WeaponSystem {
   private readonly scene: Phaser.Scene;
   private readonly player: Player;
   private readonly pool: BulletPool;
+  private readonly targets: CombatTargets;
+  private readonly behaviours = new Map<string, Behaviour>();
+  private lastBehaviour: Behaviour | null = null;
 
-  constructor(scene: Phaser.Scene, player: Player, pool: BulletPool) {
+  constructor(scene: Phaser.Scene, player: Player, pool: BulletPool, targets: CombatTargets) {
     this.scene = scene;
     this.player = player;
     this.pool = pool;
+    this.targets = targets;
+  }
+
+  private behaviourFor(id: Behaviour["id"]): Behaviour {
+    let b = this.behaviours.get(id);
+    if (!b) this.behaviours.set(id, (b = createBehaviour(id)));
+    return b;
   }
 
   get activeId(): WeaponId {
@@ -50,6 +62,7 @@ export class WeaponSystem {
     const ctx: FireContext = {
       scene: this.scene,
       weapon,
+      player: p,
       origin: {
         x: p.x + Math.cos(p.aimAngle) * MUZZLE_PX,
         y: p.y + Math.sin(p.aimAngle) * MUZZLE_PX,
@@ -59,24 +72,33 @@ export class WeaponSystem {
       stats: p.stats,
       now,
       holding: input.fire,
-    };
-    const behaviour = getBehaviour(weapon.behaviour);
-
-    if (weapon.fireRate > 0) {
-      const interval = fireIntervalMs(weapon, effectiveFireRateMul(p.stats, p.buffs, now));
-      const shots = shotsDue(this.clocks[this.loadout.active], now, interval, input.fire);
-      for (let i = 0; i < shots; i++) {
-        if (!spendEnergy(p.combat, effectiveEnergyCost(weapon.energyPerShot, p.buffs, now))) {
-          this.scene.events.emit("weapon:dryfire", { weaponId: weapon.id });
-          break;
-        }
-        behaviour.fire(ctx);
+      targets: this.targets,
+      spend: (cost) => spendEnergy(p.combat, effectiveEnergyCost(cost, p.buffs, now)),
+      fired: () =>
         this.scene.events.emit("weapon:fired", {
           weaponId: weapon.id,
           x: ctx.origin.x,
           y: ctx.origin.y,
           angle: ctx.angle,
-        });
+        }),
+      dryFire: () => this.scene.events.emit("weapon:dryfire", { weaponId: weapon.id }),
+    };
+    const behaviour = this.behaviourFor(weapon.behaviour);
+    // Swapping away mid-beam/charge releases the old weapon.
+    if (this.lastBehaviour && this.lastBehaviour !== behaviour)
+      this.lastBehaviour.onRelease?.({ ...ctx, holding: false });
+    this.lastBehaviour = behaviour;
+
+    if (!behaviour.manual && weapon.fireRate > 0) {
+      const interval = fireIntervalMs(weapon, effectiveFireRateMul(p.stats, p.buffs, now));
+      const shots = shotsDue(this.clocks[this.loadout.active], now, interval, input.fire);
+      for (let i = 0; i < shots; i++) {
+        if (!ctx.spend(weapon.energyPerShot)) {
+          ctx.dryFire();
+          break;
+        }
+        behaviour.fire(ctx);
+        ctx.fired();
       }
     }
     behaviour.update?.(ctx, dt);

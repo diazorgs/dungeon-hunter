@@ -34,7 +34,7 @@ export abstract class Boss extends Phaser.Physics.Arcade.Sprite {
   damageTakenMul = 1;
   protected readonly world: CombatWorld;
   protected readonly telegraph: Telegraph;
-  private readonly scheduler: AttackScheduler;
+  protected readonly scheduler: AttackScheduler;
   private phase = -1;
 
   constructor(
@@ -55,6 +55,11 @@ export abstract class Boss extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     // Bosses ignore knockback.
     this.body.pushable = false;
+  }
+
+  /** Hittable pieces; multi-part bosses return their heads too (ids must be negative and unique). */
+  parts(): { id: number; part?: string; sprite: Phaser.Physics.Arcade.Sprite }[] {
+    return [{ id: -1, sprite: this }];
   }
 
   /** One attack list per phase, matching `def.thresholds` (length + 1). */

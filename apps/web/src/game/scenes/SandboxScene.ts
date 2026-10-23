@@ -115,6 +115,13 @@ export class SandboxScene extends Phaser.Scene {
     kb.on("keydown-ONE", () => this.spawnRing());
     kb.on("keydown-TWO", () => this.world.enemyBullets.clear());
     kb.on("keydown-G", () => (this.world.player.god = !this.world.player.god));
+    // R cycles the active slot through all 12 weapons (energy topped up).
+    kb.on("keydown-R", () => {
+      const ws = this.world.weapons;
+      const next = WEAPON_IDS[(WEAPON_IDS.indexOf(ws.activeId) + 1) % WEAPON_IDS.length]!;
+      ws.equip(next);
+      this.world.player.combat.energy = this.world.player.combat.maxEnergy;
+    });
   }
 
   private spawnRing() {
@@ -139,7 +146,7 @@ export class SandboxScene extends Phaser.Scene {
     this.info.setText(
       [
         `FPS ${this.game.loop.actualFps.toFixed(0)}  bullets ${this.world.enemyBullets.activeCount() + this.world.playerBullets.activeCount()}  god ${this.world.player.god ? "on" : "off"}  guardians ${this.world.guardians.aliveCount()}  HP ${this.world.player.combat.hp} SH ${this.world.player.combat.shield}`,
-        `1 ring  2 clear  3 crawler  4 drone  G god  Esc pause  E pick up  ${this.world.weapons.loadout.slots.join("/")} [${this.world.weapons.loadout.active}] EN ${this.world.player.combat.energy}`,
+        `1 ring  2 clear  3 crawler  4 drone  R weapon  G god  Esc pause  E pick up  ${this.world.weapons.loadout.slots.join("/")} [${this.world.weapons.loadout.active}] EN ${this.world.player.combat.energy}`,
         `${input.device} move ${m.x.toFixed(2)},${m.y.toFixed(2)} aim ${input.aimWorld.x.toFixed(0)},${input.aimWorld.y.toFixed(0)}`,
         `fire ${+input.fire} skill ${+input.skill} dash ${+input.dash} swap ${+input.swap} use ${+input.interact} map ${+input.map}`,
         `skill ${(this.world.skills.cooldown.remaining(time) / 1000).toFixed(1)}s  overcharge ${isActive(this.world.player.buffs, "overcharge", time) ? "ON" : "-"}  dash ${this.world.player.dashCharges(time)}`,

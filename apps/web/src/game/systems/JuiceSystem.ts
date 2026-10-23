@@ -102,6 +102,22 @@ export class JuiceSystem {
       );
       if (s) this.shakeCamera(s);
     });
+    on("weapon:blast", (d: { x: number; y: number; radius: number }) => {
+      const ring = scene.add.circle(d.x, d.y, d.radius, 0xfde3a7, 0.5).setDepth(6000);
+      scene.tweens.add({
+        targets: ring,
+        alpha: 0,
+        scale: 1.2,
+        duration: 160,
+        onComplete: () => ring.destroy(),
+      });
+      this.sparks.explode(10, d.x, d.y);
+      const s = scaledShake(
+        { shake: { intensity: 0.01, durationMs: 120 } },
+        this.settings.screenShake,
+      );
+      if (s) this.shakeCamera(s);
+    });
     on("bullet:wall", (d: { x: number; y: number }) => this.sparks.explode(4, d.x, d.y));
     on("player:damaged", (d: { shieldLost: number; hpLost: number }) => {
       if (d.hpLost > 0) {

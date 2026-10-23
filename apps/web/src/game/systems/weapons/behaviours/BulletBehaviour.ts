@@ -1,18 +1,28 @@
+import type { Weapon } from "@dh/shared";
 import { pelletAngles } from "../../../logic/weapons/fire.ts";
 import type { Behaviour, FireContext } from "./Behaviour.ts";
+import { param, scaledDamage } from "./Behaviour.ts";
 
-/** Plain projectiles: `pellets` bullets fanned across `spreadDeg`. */
+/** Plain projectiles, also serving `pierce` (Line Rifle) and `bounce` (Scatter Coil) through params. */
 export class BulletBehaviour implements Behaviour {
-  readonly id = "bullet" as const;
+  readonly id: Weapon["behaviour"];
 
-  fire({ weapon, origin, angle, pool, stats }: FireContext): void {
-    const damage = Math.round(weapon.damage * stats.damageMul);
-    const bounces = stats.flags.has("bulletsBounce") ? 1 : 0;
+  constructor(id: "bullet" | "pierce" | "bounce" = "bullet") {
+    this.id = id;
+  }
+
+  fire(ctx: FireContext): void {
+    const { weapon, origin, angle, pool, stats } = ctx;
+    const bounces =
+      (this.id === "bounce" ? param(ctx, "bounces", 1) : 0) +
+      (stats.flags.has("bulletsBounce") ? 1 : 0);
+    const pierce = this.id === "pierce" ? param(ctx, "count", 1) : 0;
     for (const a of pelletAngles(angle, weapon.pellets, weapon.spreadDeg, Math.random))
       pool.spawn(origin.x, origin.y, a, weapon.projectileSpeed, {
-        damage,
+        damage: scaledDamage(ctx),
         knockback: weapon.knockback,
         bounces,
+        pierce,
         texture: "ph-bullet-player",
       });
   }

@@ -45,7 +45,14 @@ export class CombatWorld {
     this.skills = new SkillSystem(createSkill(runner));
     this.playerBullets = new BulletPool(scene, "player", 512);
     this.enemyBullets = new BulletPool(scene, "enemy", 768);
-    this.weapons = new WeaponSystem(scene, this.player, this.playerBullets);
+    this.weapons = new WeaponSystem(scene, this.player, this.playerBullets, {
+      all: () => [
+        ...this.guardians.alive().map((g) => GuardianSystem.asTarget(g)),
+        ...this.bosses.targets(),
+      ],
+      enemyBullets: this.enemyBullets,
+      blocked,
+    });
     this.hazards = new HazardSystem(scene, this.player);
     this.guardians = new GuardianSystem(
       scene,
@@ -56,7 +63,10 @@ export class CombatWorld {
       this.hazards,
     );
     this.aim.setBlocked(blocked);
-    this.aim.setTargetsProvider(() => this.guardians.targets());
+    this.aim.setTargetsProvider(() => [
+      ...this.guardians.targets(),
+      ...this.bosses.targets().map((t) => ({ id: t.id, x: t.x, y: t.y, visible: true })),
+    ]);
     scene.physics.add.collider(this.player, walls);
     this.playerBullets.collideWith(walls);
     this.enemyBullets.collideWith(walls);

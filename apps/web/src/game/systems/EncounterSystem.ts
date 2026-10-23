@@ -26,7 +26,6 @@ interface Active {
 
 /** Locks combat rooms on entry, runs their waves under the difficulty budget, unlocks on clear. */
 export class EncounterSystem {
-  roomsCleared = 0;
   private readonly cleared = new Set<number>();
   private current: number | null = null;
   private active: Active | null = null;
@@ -36,14 +35,14 @@ export class EncounterSystem {
   private readonly sector: ComposedSector;
   private readonly sectorId: SectorId;
   private readonly seed: string;
-  private readonly priorCleared: number;
+  private readonly roomsClearedThisRun: () => number;
 
   constructor(
     scene: Phaser.Scene,
     guardians: GuardianSystem,
     doors: readonly Door[],
     sector: ComposedSector,
-    opts: { sectorId: SectorId; seed: string; priorRoomsCleared?: number },
+    opts: { sectorId: SectorId; seed: string; roomsClearedThisRun: () => number },
   ) {
     this.scene = scene;
     this.guardians = guardians;
@@ -51,7 +50,7 @@ export class EncounterSystem {
     this.sector = sector;
     this.sectorId = opts.sectorId;
     this.seed = opts.seed;
-    this.priorCleared = opts.priorRoomsCleared ?? 0;
+    this.roomsClearedThisRun = opts.roomsClearedThisRun;
   }
 
   update(player: Player): void {
@@ -75,7 +74,7 @@ export class EncounterSystem {
       return;
     }
     const rng = createRng(this.seed).fork(`spawns:s${this.sectorId}:r${room.id}`);
-    const budget = roomBudget(this.sectorId, this.priorCleared + this.roomsCleared);
+    const budget = roomBudget(this.sectorId, this.roomsClearedThisRun());
     this.active = {
       room,
       rng,
@@ -131,7 +130,6 @@ export class EncounterSystem {
     const room = this.active!.room;
     this.active = null;
     this.cleared.add(room.id);
-    this.roomsCleared++;
     for (const d of this.roomDoors(room.id)) d.unlock();
     this.scene.events.emit("room:cleared", { roomId: room.id, type: room.type });
   }

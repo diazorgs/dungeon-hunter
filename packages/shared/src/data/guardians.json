@@ -16,7 +16,7 @@
       "windupMs": 300
     },
     "scrap": 1,
-    "energyOrbChance": 0.2
+    "energyOrbChance": 0.35
   },
   {
     "id": "crawler",
@@ -34,7 +34,7 @@
       "blastDamage": 1
     },
     "scrap": 1,
-    "energyOrbChance": 0.2
+    "energyOrbChance": 0.25
   },
   {
     "id": "turret-node",
@@ -47,7 +47,7 @@
     "ai": "turret",
     "attack": {},
     "scrap": 2,
-    "energyOrbChance": 0.2
+    "energyOrbChance": 0.4
   },
   {
     "id": "shield-bot",
@@ -60,7 +60,7 @@
     "ai": "shield",
     "attack": {},
     "scrap": 2,
-    "energyOrbChance": 0.2
+    "energyOrbChance": 0.4
   },
   {
     "id": "arc-spider",
@@ -73,7 +73,7 @@
     "ai": "spider",
     "attack": {},
     "scrap": 2,
-    "energyOrbChance": 0.2
+    "energyOrbChance": 0.4
   },
   {
     "id": "mortar-unit",
@@ -86,7 +86,7 @@
     "ai": "mortar",
     "attack": {},
     "scrap": 3,
-    "energyOrbChance": 0.2
+    "energyOrbChance": 0.4
   },
   {
     "id": "bleed-wraith",
@@ -99,6 +99,6 @@
     "ai": "wraith",
     "attack": {},
     "scrap": 3,
-    "energyOrbChance": 0.2
+    "energyOrbChance": 0.4
   }
 ]

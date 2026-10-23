@@ -94,6 +94,7 @@ export class JuiceSystem {
     });
     on("player:dashed", () => audio.play("sfx.dash"));
     on("room:locked", () => audio.play("sfx.door-lock"));
+    on("pickup:collected", () => audio.play("sfx.pickup", { volume: 0.5 }));
     on("room:cleared", () => audio.play("sfx.door-unlock"));
   }
 

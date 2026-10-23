@@ -111,6 +111,59 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
       f(PALETTE["bleed-500"], 10, 2, 2, 8)
     ),
   ],
+  "ph-orb": [
+    5,
+    5,
+    (_, f) => (
+      f(PALETTE.energy, 1, 0, 3, 5),
+      f(PALETTE.energy, 0, 1, 5, 3),
+      f(PALETTE.shield, 1, 1, 2, 2)
+    ),
+  ],
+  "ph-scrap": [4, 4, (_, f) => (f(PALETTE["rust-700"], 0, 0, 4, 4), f(PALETTE.scrap, 0, 0, 3, 3))],
+  "ph-health": [
+    7,
+    7,
+    (_, f) => (
+      f(PALETTE.bone, 0, 0, 7, 7),
+      f(PALETTE.heal, 3, 1, 1, 5),
+      f(PALETTE.heal, 1, 3, 5, 1)
+    ),
+  ],
+  "ph-crate": [
+    14,
+    14,
+    (_, f) => (
+      f(PALETTE["rust-700"], 0, 0, 14, 14),
+      f(PALETTE["rust-500"], 1, 1, 12, 12),
+      f(PALETTE["rust-700"], 1, 6, 12, 2),
+      f(PALETTE["amber-500"], 6, 1, 2, 12)
+    ),
+  ],
+  "ph-chest": [
+    16,
+    12,
+    (_, f) => (
+      f(PALETTE["steel-700"], 0, 0, 16, 12),
+      f(PALETTE["steel-500"], 1, 1, 14, 4),
+      f(PALETTE["amber-500"], 7, 5, 2, 3)
+    ),
+  ],
+  "ph-chest-gold": [
+    16,
+    12,
+    (_, f) => (
+      f(PALETTE.scrap, 0, 0, 16, 12),
+      f(PALETTE["steel-700"], 1, 1, 14, 10),
+      f(PALETTE.scrap, 1, 4, 14, 1),
+      f(PALETTE.bone, 7, 5, 2, 3)
+    ),
+  ],
+  "ph-chest-open": [
+    16,
+    12,
+    (_, f) => (f(PALETTE["steel-700"], 0, 4, 16, 8), f(PALETTE.ink, 1, 5, 14, 3)),
+  ],
   "ph-spark": [2, 2, (_, f) => f(PALETTE.white, 0, 0, 2, 2)],
   "ph-casing": [2, 1, (_, f) => f(PALETTE["amber-500"], 0, 0, 2, 1)],
   "ph-muzzle": [

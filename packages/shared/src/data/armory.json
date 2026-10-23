@@ -6,11 +6,6 @@
   },
   {
     "itemType": "weapon",
-    "itemId": "arc-carbine",
-    "cost": 80
-  },
-  {
-    "itemType": "weapon",
     "itemId": "scatter-coil",
     "cost": 80
   },

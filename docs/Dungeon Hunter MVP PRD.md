@@ -129,7 +129,7 @@ The MVP has 12 weapons and 10 Vault Mods, all defined in JSON in `packages/share
 | Rivet SMG       | Automatic | Common  | 1               | High fire rate, wide spread               |
 | Breach Shotgun  | Shotgun   | Common  | 3               | 5 pellets, strong knockback               |
 | Line Rifle      | Rifle     | Common  | 2               | Pierces 1 enemy                           |
-| Arc Carbine     | Burst     | Rare    | 2               | 3-round burst                             |
+| Arc Carbine     | Burst     | Common  | 2               | 3-round burst                             |
 | Scatter Coil    | Shotgun   | Rare    | 4               | Pellets bounce off walls once             |
 | Pulse Lance     | Beam      | Rare    | 5 per second    | Continuous laser, ramps damage            |
 | Grid Cutter     | Melee     | Rare    | 0               | Swing deletes enemy bullets               |

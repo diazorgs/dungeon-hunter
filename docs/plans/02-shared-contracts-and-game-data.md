@@ -167,7 +167,7 @@ Starting values (PRD values verbatim; the rest are first-pass numbers):
 | rivet-smg       | common  | 1        | 2   | 12     | 12      | 300   | bullet                                                  |
 | breach-shotgun  | common  | 3        | 2   | 1.6    | 30      | 260   | bullet, pellets 5, knockback 120                        |
 | line-rifle      | common  | 2        | 6   | 2.5    | 1       | 420   | pierce (count 1)                                        |
-| arc-carbine     | rare    | 2        | 3   | 2      | 2       | 340   | burst (count 3, intervalMs 60)                          |
+| arc-carbine     | common  | 2        | 3   | 2      | 2       | 340   | burst (count 3, intervalMs 60)                          |
 | scatter-coil    | rare    | 4        | 2   | 1.4    | 34      | 260   | bounce (bounces 1), pellets 6                           |
 | pulse-lance     | rare    | 0 (+5/s) | —   | —      | 0       | —     | beam (baseDps 8, maxDps 20, rampSec 1.5, range 160)     |
 | grid-cutter     | rare    | 0        | 5   | 2.2    | 0       | 0     | melee-swing (arcDeg 120, range 26, deletesBullets true) |
@@ -185,7 +185,7 @@ Starting values (PRD values verbatim; the rest are first-pass numbers):
 | mortar-unit  | 2         | 12  | 20    | 3          | mortar        | 3     |
 | bleed-wraith | 3         | 18  | 60    | 4          | wraith        | 3     |
 
-Runners: vex (6/4/180, skill `overcharge` cooldown 20 duration 5, unlockCost 0), kit (5/5/200, skill `patch-drone` cooldown 22 duration 8, unlockCost 300). Bosses: gatekeeper hp 400, conduit-hydra hp 750 (3 heads × 150 + core 300), core-warden hp 1200; phases filled in plans 14, 18, 20. Mods: effects per DESIGN.md §6.2. Armory: kit 300; arc-carbine, scatter-coil, pulse-lance, grid-cutter, fuse-launcher 80; static-repeater, null-cannon 150; thorn-plating, lucky-seal, dash-coil 60.
+Runners: vex (6/4/180, skill `overcharge` cooldown 20 duration 5, unlockCost 0), kit (5/5/200, skill `patch-drone` cooldown 22 duration 8, unlockCost 300). Bosses: gatekeeper hp 400, conduit-hydra hp 750 (3 heads × 150 + core 300), core-warden hp 1200; phases filled in plans 14, 18, 20. Mods: effects per DESIGN.md §6.2. Armory: kit 300; scatter-coil, pulse-lance, grid-cutter, fuse-launcher 80; static-repeater, null-cannon 150; thorn-plating, lucky-seal, dash-coil 60.
 
 - [ ] **Step 1: Write failing tests** `content.test.ts`:
 

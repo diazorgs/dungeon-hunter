@@ -114,7 +114,7 @@
     "id": "arc-carbine",
     "name": "Arc Carbine",
     "type": "burst",
-    "rarity": "rare",
+    "rarity": "common",
     "energyPerShot": 2,
     "damage": 3,
     "fireRate": 2,

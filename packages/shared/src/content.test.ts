@@ -19,9 +19,8 @@ test.each([
   ["logs", LOG_IDS, Object.keys(LOGS)],
 ])("%s JSON ids match tuple", (_n, ids, keys) => expect([...keys].sort()).toEqual([...ids].sort()));
 
-// The PRD says "5 commons" but its weapon table lists 4; the data follows the table.
-test("starter pool is pistol + the 4 commons", () => {
-  expect(STARTER_WEAPON_POOL).toHaveLength(5);
+test("starter pool is pistol + 5 commons", () => {
+  expect(STARTER_WEAPON_POOL).toHaveLength(6);
   expect(STARTER_WEAPON_POOL).toContain("rust-pistol");
 });
 

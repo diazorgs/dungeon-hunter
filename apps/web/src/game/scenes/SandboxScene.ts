@@ -71,6 +71,21 @@ export class SandboxScene extends Phaser.Scene {
       .forEach((id, i) =>
         this.world.weapons.dropOnFloor(id, room.inner.x + 24 + i * 24, room.inner.bottom - 16),
       );
+    // `bleed:crawler` / `elite:crawler` spawn variants.
+    spawn
+      .map((s) => s.split(":"))
+      .filter(
+        ([pre, id]) =>
+          (pre === "bleed" || pre === "elite") && GUARDIAN_IDS.includes(id as GuardianId),
+      )
+      .forEach(([pre, id], i) =>
+        this.world.guardians.spawn(
+          id as GuardianId,
+          room.inner.x + 24 + i * 24,
+          room.inner.y + 24,
+          { [pre!]: true },
+        ),
+      );
     spawn
       .filter((id): id is GuardianId => (GUARDIAN_IDS as readonly string[]).includes(id))
       .forEach((id, i) =>

@@ -186,6 +186,25 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
     ),
   ],
   "ph-bullet-player": [3, 3, (_, f) => f(PALETTE["amber-300"], 0, 0, 3, 3)],
+  "ph-bullet-bleed": [
+    5,
+    5,
+    (_, f) => (f(PALETTE["bleed-500"], 0, 0, 5, 5), f(PALETTE["bleed-100"], 1, 1, 3, 3)),
+  ],
+  "ph-shield": [
+    4,
+    16,
+    (_, f) => (f(PALETTE["teal-200"], 0, 0, 4, 16), f(PALETTE["teal-600"], 1, 1, 2, 14)),
+  ],
+  "ph-shell": [
+    6,
+    6,
+    (_, f) => (
+      f(PALETTE["rust-700"], 1, 0, 4, 6),
+      f(PALETTE["rust-700"], 0, 1, 6, 4),
+      f(PALETTE["amber-500"], 1, 1, 4, 4)
+    ),
+  ],
   "ph-bullet-enemy": [
     5,
     5,

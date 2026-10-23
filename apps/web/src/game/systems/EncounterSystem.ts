@@ -7,6 +7,7 @@ import type { Player } from "../entities/Player.ts";
 import { roomAt } from "../logic/camera.ts";
 import type { ComposedRoom, ComposedSector } from "../logic/dungeon/compose.ts";
 import { buildWaves, encounterPool, roomBudget } from "../logic/encounter/budget.ts";
+import { ELITE_CHANCE } from "../logic/spawn/modifiers.ts";
 import type { Wave } from "../logic/encounter/budget.ts";
 import { IMPLEMENTED_AI } from "./ai/registry.ts";
 import type { GuardianSystem } from "./GuardianSystem.ts";
@@ -92,6 +93,7 @@ export class EncounterSystem {
       spawning: false,
       waves: buildWaves(budget, encounterPool(this.sectorId, IMPLEMENTED_AI), rng, {
         bleed: this.sectorId === 3,
+        eliteChance: ELITE_CHANCE[this.sectorId],
       }),
       points: this.sector.spawns.filter((s) => s.roomId === room.id && s.kind === "guardian"),
     };

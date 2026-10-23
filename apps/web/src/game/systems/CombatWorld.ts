@@ -10,6 +10,7 @@ import { JuiceSystem } from "./JuiceSystem.ts";
 import { BossSystem } from "./BossSystem.ts";
 import { BulletPool } from "./BulletPool.ts";
 import { GuardianSystem } from "./GuardianSystem.ts";
+import { HazardSystem } from "./HazardSystem.ts";
 import { createSkill, SkillSystem } from "./SkillSystem.ts";
 import { WeaponSystem } from "./weapons/WeaponSystem.ts";
 
@@ -22,6 +23,7 @@ export class CombatWorld {
   readonly enemyBullets: BulletPool;
   readonly weapons: WeaponSystem;
   readonly guardians: GuardianSystem;
+  readonly hazards: HazardSystem;
   readonly audio: AudioSystem;
   readonly juice: JuiceSystem;
   readonly bosses: BossSystem;
@@ -44,12 +46,14 @@ export class CombatWorld {
     this.playerBullets = new BulletPool(scene, "player", 512);
     this.enemyBullets = new BulletPool(scene, "enemy", 768);
     this.weapons = new WeaponSystem(scene, this.player, this.playerBullets);
+    this.hazards = new HazardSystem(scene, this.player);
     this.guardians = new GuardianSystem(
       scene,
       this.player,
       { player: this.playerBullets, enemy: this.enemyBullets },
       walls,
       blocked,
+      this.hazards,
     );
     this.aim.setBlocked(blocked);
     this.aim.setTargetsProvider(() => this.guardians.targets());
@@ -79,6 +83,7 @@ export class CombatWorld {
     this.weapons.update(input, now, dt);
     this.guardians.update(now, dt);
     this.bosses.update(now, dt);
+    this.hazards.update(now);
     this.playerBullets.update(now);
     this.enemyBullets.update(now);
   }

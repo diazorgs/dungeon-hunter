@@ -64,7 +64,12 @@
     "contactDamage": 1,
     "budgetCost": 3,
     "ai": "shield",
-    "attack": {},
+    "attack": {
+      "shieldArcDeg": 100,
+      "turnDegPerSec": 90,
+      "boltSpeed": 90,
+      "fireEveryMs": 2000
+    },
     "scrap": 2,
     "energyOrbChance": 0.4
   },
@@ -77,7 +82,14 @@
     "contactDamage": 1,
     "budgetCost": 2,
     "ai": "spider",
-    "attack": {},
+    "attack": {
+      "dashSpeed": 160,
+      "dashMs": 400,
+      "restMs": 600,
+      "trailEveryMs": 80,
+      "trailMs": 2000,
+      "trailDamage": 1
+    },
     "scrap": 2,
     "energyOrbChance": 0.4
   },
@@ -90,7 +102,13 @@
     "contactDamage": 1,
     "budgetCost": 3,
     "ai": "mortar",
-    "attack": {},
+    "attack": {
+      "fireEveryMs": 2400,
+      "telegraphMs": 900,
+      "blastRadius": 20,
+      "blastDamage": 1,
+      "minRange": 48
+    },
     "scrap": 3,
     "energyOrbChance": 0.4
   },
@@ -103,7 +121,13 @@
     "contactDamage": 1,
     "budgetCost": 4,
     "ai": "wraith",
-    "attack": {},
+    "attack": {
+      "teleportEveryMs": 2800,
+      "fadeMs": 300,
+      "ringCount": 12,
+      "ringSpeed": 85,
+      "minPlayerDist": 48
+    },
     "scrap": 3,
     "energyOrbChance": 0.4
   }

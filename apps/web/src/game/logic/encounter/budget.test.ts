@@ -34,3 +34,12 @@ test("pool respects sectorMin and implemented AI", () =>
       .map((p) => p.id)
       .sort(),
   ).toEqual(["crawler", "sentry-drone"]));
+
+test("bleed marks every entry except the wraith", () => {
+  const p = [
+    { id: "crawler" as const, cost: 1 },
+    { id: "bleed-wraith" as const, cost: 1 },
+  ];
+  for (const e of buildWaves(12, p, rng(), { bleed: true }).flat())
+    expect(e.bleed).toBe(e.guardianId !== "bleed-wraith");
+});

@@ -29,7 +29,7 @@ export class TurretAi implements AiController {
           enter: () => g.setTint(PALETTE["amber-300"]).setTintMode(Phaser.TintModes.ADD),
           update: (_c, now) =>
             now - this.fsm.enteredAt >= (a.windupMs ?? 400) ? "fire" : undefined,
-          exit: () => g.clearTint(),
+          exit: () => g.resetLook(),
         },
         fire: {
           enter: (_c, now) => {
@@ -38,10 +38,7 @@ export class TurretAi implements AiController {
             if (!w.canSee(g, w.player)) return;
             const aim = Math.atan2(w.player.y - g.y, w.player.x - g.x);
             for (const angle of spread(aim, a.spreadCount ?? 3, a.spreadArcDeg ?? 30))
-              w.enemyBullets.spawn(g.x, g.y, angle, a.boltSpeed ?? 100, {
-                damage: 1,
-                texture: "ph-bullet-enemy",
-              });
+              g.fire(w.enemyBullets, angle, a.boltSpeed ?? 100);
           },
           update: () => "idle",
         },

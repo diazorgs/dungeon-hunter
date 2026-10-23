@@ -1,16 +1,15 @@
-import { PALETTE } from "@dh/shared";
 import type { Guardian as GuardianDef } from "@dh/shared";
 import Phaser from "phaser";
 import { textureFor } from "../content/textures.ts";
 import { createEnemyHealth, damageEnemy, isStunned, stun } from "../logic/combat/enemyHealth.ts";
 import type { EnemyHealth } from "../logic/combat/enemyHealth.ts";
+import { spawnModifiers } from "../logic/spawn/modifiers.ts";
+import type { GuardianSpawnOpts } from "../logic/spawn/modifiers.ts";
 import type { AiController } from "../systems/ai/AiController.ts";
+import type { BulletPool } from "../systems/BulletPool.ts";
+import { applyBleedVisual } from "../systems/visuals/bleed.ts";
 
-export interface GuardianSpawnOpts {
-  elite?: boolean;
-  bleed?: boolean;
-  hpMul?: number;
-}
+export type { GuardianSpawnOpts };
 
 const KNOCKBACK_MS = 100;
 
@@ -23,6 +22,9 @@ export class Guardian extends Phaser.Physics.Arcade.Sprite {
   readonly opts: GuardianSpawnOpts;
   ai!: AiController;
   knockedUntil = 0;
+  readonly bulletSpeedMul: number;
+  /** Where it spawned; AIs that relocate (Wraith) stay near it. */
+  readonly home: { x: number; y: number };
 
   constructor(
     scene: Phaser.Scene,
@@ -37,14 +39,29 @@ export class Guardian extends Phaser.Physics.Arcade.Sprite {
     this.def = def;
     this.uid = uid;
     this.opts = opts;
-    // DESIGN.md §7.1: elite ×2 HP and ×1.5 scale, Bleed ×1.4 HP and magenta.
-    const hpMul = (opts.hpMul ?? 1) * (opts.elite ? 2 : 1) * (opts.bleed ? 1.4 : 1);
-    this.health = createEnemyHealth(def.hp, hpMul);
+    const mods = spawnModifiers(opts);
+    this.health = createEnemyHealth(def.hp, mods.hpMul);
+    this.bulletSpeedMul = mods.bulletSpeedMul;
+    this.home = { x, y };
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    if (opts.elite) this.setScale(1.5);
-    if (opts.bleed) this.setTint(PALETTE["bleed-500"]);
+    this.setScale(mods.scale);
+    this.resetLook();
     if (def.speed === 0) this.setImmovable(true);
+  }
+
+  /** Back to the base look after a telegraph tint (keeps the Bleed treatment). */
+  resetLook(): void {
+    if (this.opts.bleed) applyBleedVisual(this);
+    else this.clearTint();
+  }
+
+  /** Enemy shot honouring the Bleed bullet speed and colour. */
+  fire(pool: BulletPool, angle: number, speed: number, damage = 1, x = this.x, y = this.y): void {
+    pool.spawn(x, y, angle, speed * this.bulletSpeedMul, {
+      damage,
+      texture: this.opts.bleed ? "ph-bullet-bleed" : "ph-bullet-enemy",
+    });
   }
 
   /** Busy = stunned or mid-knockback: no steering, no attacks, still hittable. */

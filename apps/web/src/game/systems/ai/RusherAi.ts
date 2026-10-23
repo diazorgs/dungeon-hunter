@@ -32,10 +32,10 @@ export class RusherAi implements AiController {
             const t = now - this.fsm.enteredAt;
             // Blink white while the fuse burns.
             if (Math.floor(t / 60) % 2) g.setTint(PALETTE.white).setTintMode(Phaser.TintModes.FILL);
-            else g.clearTint();
+            else g.resetLook();
             return t >= (a.fuseMs ?? 350) ? "explode" : undefined;
           },
-          exit: () => g.clearTint(),
+          exit: () => g.resetLook(),
         },
         explode: {
           enter: (_c, now) => {

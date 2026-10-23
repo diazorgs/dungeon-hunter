@@ -34,7 +34,12 @@ export function buildWaves(
       const elite = !eliteUsed && pick.cost * 2 <= left && rng.chance(opts.eliteChance ?? 0.1);
       eliteUsed ||= elite;
       left -= pick.cost * (elite ? 2 : 1);
-      wave.push({ guardianId: pick.id, elite, bleed: opts.bleed ?? false });
+      // The Wraith is Bleed by nature; Bleed marks everyone else.
+      wave.push({
+        guardianId: pick.id,
+        elite,
+        bleed: (opts.bleed ?? false) && pick.id !== "bleed-wraith",
+      });
     }
     return wave;
   });

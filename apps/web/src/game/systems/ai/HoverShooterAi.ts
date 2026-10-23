@@ -35,16 +35,13 @@ export class HoverShooterAi implements AiController {
           },
           update: (_c, now) =>
             now - this.fsm.enteredAt >= (a.windupMs ?? 300) ? "fire" : undefined,
-          exit: () => g.clearTint(),
+          exit: () => g.resetLook(),
         },
         fire: {
           enter: () => {
             const p = w.player;
             const angle = Math.atan2(p.y - g.y, p.x - g.x);
-            w.enemyBullets.spawn(g.x, g.y, angle, a.boltSpeed ?? 90, {
-              damage: a.boltDamage ?? 1,
-              texture: "ph-bullet-enemy",
-            });
+            g.fire(w.enemyBullets, angle, a.boltSpeed ?? 90, a.boltDamage ?? 1);
           },
           update: () => "drift",
         },

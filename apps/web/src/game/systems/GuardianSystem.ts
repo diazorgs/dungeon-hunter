@@ -11,6 +11,8 @@ import { lineClear } from "../logic/los.ts";
 import type { AiWorld } from "./ai/AiController.ts";
 import { getAi } from "./ai/registry.ts";
 import type { BulletPool } from "./BulletPool.ts";
+import type { HazardSystem } from "./HazardSystem.ts";
+import { BLEED } from "../logic/spawn/modifiers.ts";
 
 const TILE = 16;
 const NUDGE_TILES = 3;
@@ -30,6 +32,7 @@ export class GuardianSystem {
     pools: { player: BulletPool; enemy: BulletPool },
     walls: Phaser.Types.Physics.Arcade.ArcadeColliderType,
     blocked: (x: number, y: number) => boolean,
+    hazards: HazardSystem,
   ) {
     this.scene = scene;
     this.player = player;
@@ -41,7 +44,17 @@ export class GuardianSystem {
       enemyBullets: pools.enemy,
       neighbours: (self) => this.alive().filter((g) => g !== self),
       canSee: (from, to) => lineClear(blocked, from, to),
+      hazards,
+      blocked,
     };
+    scene.events.on("guardian:killed", (d: { x: number; y: number; bleed: boolean }) => {
+      if (d.bleed)
+        hazards.spawn("puddle", d.x, d.y, {
+          radius: 12,
+          damage: BLEED.puddleDamage,
+          durationMs: BLEED.puddleMs,
+        });
+    });
     const physics = scene.physics.add;
     physics.collider(this.group, walls);
     physics.overlap(pools.player.group, this.group, (b, g) =>
@@ -100,6 +113,18 @@ export class GuardianSystem {
 
   private onPlayerBullet(b: Bullet, g: Guardian): void {
     if (!b.active || g.health.dead || b.hitIds.has(g.uid)) return;
+    if (g.ai.blocks?.(b)) {
+      // Bouncing shots glance off the shield; everything else sparks and dies.
+      if (b.bouncesLeft > 0) {
+        b.bouncesLeft--;
+        b.setVelocity(-b.body.velocity.x, -b.body.velocity.y);
+        b.hitIds.add(g.uid);
+      } else {
+        this.scene.events.emit("bullet:wall", { x: b.x, y: b.y, owner: b.owner });
+        b.kill();
+      }
+      return;
+    }
     b.hitIds.add(g.uid);
     g.takeHit(b.damage, b.knockback, b.rotation, this.scene.time.now, b.stunMs);
     if (b.pierceLeft > 0) b.pierceLeft--;

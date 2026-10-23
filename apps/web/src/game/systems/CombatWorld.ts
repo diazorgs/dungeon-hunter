@@ -4,6 +4,7 @@ import { Player } from "../entities/Player.ts";
 import type { InputState, Vec2 } from "../logic/input.ts";
 import { AimAssist } from "./AimAssist.ts";
 import { BulletPool } from "./BulletPool.ts";
+import { GuardianSystem } from "./GuardianSystem.ts";
 import { createSkill, SkillSystem } from "./SkillSystem.ts";
 import { WeaponSystem } from "./weapons/WeaponSystem.ts";
 
@@ -15,6 +16,7 @@ export class CombatWorld {
   readonly playerBullets: BulletPool;
   readonly enemyBullets: BulletPool;
   readonly weapons: WeaponSystem;
+  readonly guardians: GuardianSystem;
   private readonly scene: Phaser.Scene;
   // shortcut: bare crosshair so the hidden cursor is usable; plan 08 owns the real one.
   private readonly crosshair: Phaser.GameObjects.Image;
@@ -24,6 +26,7 @@ export class CombatWorld {
     runner: Runner,
     walls: Phaser.Physics.Arcade.StaticGroup,
     at: Vec2,
+    blocked: (x: number, y: number) => boolean,
   ) {
     this.scene = scene;
     this.player = new Player(scene, at.x, at.y, runner);
@@ -31,7 +34,15 @@ export class CombatWorld {
     this.playerBullets = new BulletPool(scene, "player", 512);
     this.enemyBullets = new BulletPool(scene, "enemy", 768);
     this.weapons = new WeaponSystem(scene, this.player, this.playerBullets);
+    this.guardians = new GuardianSystem(
+      scene,
+      this.player,
+      { player: this.playerBullets, enemy: this.enemyBullets },
+      walls,
+      blocked,
+    );
     this.aim.setWalls(walls);
+    this.aim.setTargetsProvider(() => this.guardians.targets());
     scene.physics.add.collider(this.player, walls);
     this.playerBullets.collideWith(walls);
     this.enemyBullets.collideWith(walls);
@@ -45,6 +56,7 @@ export class CombatWorld {
     if (input.skill) this.skills.tryActivate(ctx, now);
     this.skills.update(ctx, now, dt);
     this.weapons.update(input, now, dt);
+    this.guardians.update(now, dt);
     this.playerBullets.update(now);
     this.enemyBullets.update(now);
     this.crosshair.setPosition(Math.round(input.aimWorld.x), Math.round(input.aimWorld.y));

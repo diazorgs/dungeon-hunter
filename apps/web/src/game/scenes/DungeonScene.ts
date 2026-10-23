@@ -25,10 +25,16 @@ export class DungeonScene extends Phaser.Scene {
     this.cameras.main.setRoundPixels(true);
     const room = buildPlaceholderRoom(this, 15, 11);
     this.input$ = new InputSystem(this);
-    this.world = new CombatWorld(this, RUNNERS[this.runConfig.runnerId], room.walls, {
-      x: room.inner.centerX,
-      y: room.inner.centerY,
-    });
+    this.world = new CombatWorld(
+      this,
+      RUNNERS[this.runConfig.runnerId],
+      room.walls,
+      {
+        x: room.inner.centerX,
+        y: room.inner.centerY,
+      },
+      room.blocked,
+    );
     // Keys pressed while paused must not replay on resume.
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.input$.reset());
 

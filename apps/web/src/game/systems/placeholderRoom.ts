@@ -7,7 +7,11 @@ export function buildPlaceholderRoom(
   scene: Phaser.Scene,
   cols: number,
   rows: number,
-): { walls: Phaser.Physics.Arcade.StaticGroup; inner: Phaser.Geom.Rectangle } {
+): {
+  walls: Phaser.Physics.Arcade.StaticGroup;
+  inner: Phaser.Geom.Rectangle;
+  blocked: (x: number, y: number) => boolean;
+} {
   const { width, height } = scene.scale;
   const x0 = Math.round((width - cols * TILE) / 2);
   const y0 = Math.round((height - rows * TILE) / 2);
@@ -26,5 +30,9 @@ export function buildPlaceholderRoom(
     (cols - 2) * TILE,
     (rows - 2) * TILE,
   );
-  return { walls, inner };
+  const blocked = (x: number, y: number) =>
+    (walls.getChildren() as Phaser.Physics.Arcade.Image[]).some((w) =>
+      w.getBounds().contains(x, y),
+    );
+  return { walls, inner, blocked };
 }

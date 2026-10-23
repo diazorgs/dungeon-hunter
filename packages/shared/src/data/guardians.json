@@ -8,7 +8,13 @@
     "contactDamage": 1,
     "budgetCost": 1,
     "ai": "hover-shooter",
-    "attack": {},
+    "attack": {
+      "boltSpeed": 90,
+      "boltDamage": 1,
+      "fireEveryMs": 1800,
+      "preferredRange": 96,
+      "windupMs": 300
+    },
     "scrap": 1,
     "energyOrbChance": 0.2
   },
@@ -18,10 +24,15 @@
     "sectorMin": 1,
     "hp": 6,
     "speed": 90,
-    "contactDamage": 1,
+    "contactDamage": 0,
     "budgetCost": 1,
     "ai": "rusher",
-    "attack": {},
+    "attack": {
+      "triggerRange": 18,
+      "fuseMs": 350,
+      "blastRadius": 20,
+      "blastDamage": 1
+    },
     "scrap": 1,
     "energyOrbChance": 0.2
   },

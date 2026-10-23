@@ -4,8 +4,13 @@ import Phaser from "phaser";
 import { textureFor } from "../content/textures.ts";
 import type { ActiveBuffs } from "../logic/combat/buffs.ts";
 import { isActive } from "../logic/combat/buffs.ts";
-import { createCombatant, grantInvuln, tickShieldRegen } from "../logic/combat/combatant.ts";
-import type { CombatantState } from "../logic/combat/combatant.ts";
+import {
+  applyDamage,
+  createCombatant,
+  grantInvuln,
+  tickShieldRegen,
+} from "../logic/combat/combatant.ts";
+import type { CombatantState, DamageResult } from "../logic/combat/combatant.ts";
 import { ChargePool } from "../logic/combat/cooldown.ts";
 import { applyStatChange, deriveStats } from "../logic/combat/stats.ts";
 import type { PlayerStats } from "../logic/combat/stats.ts";
@@ -28,6 +33,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   /** Assisted aim that weapons read. */
   aimAngle = 0;
   isDashing = false;
+  /** DEV sandbox toggle: ignore all damage. */
+  god = false;
   facing: 1 | -1 = 1;
   private readonly dash: ChargePool;
   private dashEndsAt = 0;
@@ -46,6 +53,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   dashCharges(now: number): number {
     return this.dash.charges(now);
+  }
+
+  /** All damage to the Runner goes through here. Emits `player:damaged` / `player:died`. */
+  hurt(amount: number, now: number): DamageResult | null {
+    if (this.god) return null;
+    const r = applyDamage(this.combat, amount, now);
+    if (r.ignored) return r;
+    this.scene.events.emit("player:damaged", { shieldLost: r.shieldLost, hpLost: r.hpLost });
+    if (r.died) this.scene.events.emit("player:died");
+    return r;
   }
 
   setStats(next: PlayerStats): void {

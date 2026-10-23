@@ -6,6 +6,7 @@ import logsJson from "./data/logs.json" with { type: "json" };
 import modsJson from "./data/mods.json" with { type: "json" };
 import radioJson from "./data/radio.json" with { type: "json" };
 import runnersJson from "./data/runners.json" with { type: "json" };
+import sectorsJson from "./data/sectors.json" with { type: "json" };
 import weaponsJson from "./data/weapons.json" with { type: "json" };
 import {
   ArmoryItemSchema,
@@ -14,11 +15,14 @@ import {
   ModSchema,
   RadioLineSchema,
   RunnerSchema,
+  SectorConfigSchema,
   VaultLogSchema,
   WeaponSchema,
 } from "./schemas/content.ts";
 import { BOSS_IDS, GUARDIAN_IDS, LOG_IDS, MOD_IDS, RUNNER_IDS, WEAPON_IDS } from "./schemas/ids.ts";
-import type { ModId, WeaponId } from "./schemas/ids.ts";
+import type { ModId, SectorId, WeaponId } from "./schemas/ids.ts";
+import type { SectorConfig } from "./schemas/content.ts";
+import { PALETTE } from "./palette.ts";
 
 function parseList<S extends z.ZodType>(file: string, schema: S, raw: unknown): z.infer<S>[] {
   const res = schema.array().safeParse(raw);
@@ -48,6 +52,13 @@ export const MODS = byId("mods", ModSchema, modsJson, MOD_IDS);
 export const LOGS = byId("logs", VaultLogSchema, logsJson, LOG_IDS);
 export const ARMORY = parseList("armory", ArmoryItemSchema, armoryJson);
 export const RADIO = parseList("radio", RadioLineSchema, radioJson);
+
+export const SECTORS = Object.fromEntries(
+  parseList("sectors", SectorConfigSchema, sectorsJson).map((s) => {
+    if (!(s.accent in PALETTE)) throw new Error(`data/sectors.json: unknown accent "${s.accent}"`);
+    return [s.id, s];
+  }),
+) as Record<SectorId, SectorConfig>;
 
 export const STARTER_WEAPON_POOL: WeaponId[] = WEAPON_IDS.filter((id) =>
   ["starter", "common"].includes(WEAPONS[id].rarity),

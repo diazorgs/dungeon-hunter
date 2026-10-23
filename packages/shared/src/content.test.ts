@@ -6,6 +6,7 @@ import {
   LOGS,
   MODS,
   RUNNERS,
+  SECTORS,
   STARTER_WEAPON_POOL,
   WEAPONS,
 } from "./content.ts";
@@ -55,3 +56,10 @@ test("logs: 3 per sector, 2–4 lines each", () => {
     expect(l.lines.length).toBeLessThanOrEqual(4);
   }
 });
+
+test("three sectors with the PRD names", () =>
+  expect([1, 2, 3].map((id) => SECTORS[id as 1 | 2 | 3].name)).toEqual([
+    "Storage Wing",
+    "Conduit Works",
+    "Core Approach",
+  ]));

@@ -8,5 +8,11 @@ import { lazyPlugins } from "vite-plus";
 export default defineConfig({
   plugins: lazyPlugins(() => [react(), tailwindcss(), babel({ presets: [reactCompilerPreset()] })]),
   server: { port: 5173, proxy: { "/api": "http://localhost:8787" } },
-  test: { include: ["src/**/*.test.ts"], environment: "node" },
+  test: {
+    include: ["src/**/*.test.ts"],
+    environment: "node",
+    // Vitest 5's on-disk module cache keys on file content, so import.meta.glob results
+    // go stale when room files are added (tiled.test.ts would miss new templates).
+    fsModuleCache: false,
+  },
 });

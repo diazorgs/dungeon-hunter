@@ -140,6 +140,16 @@ export const RadioLineSchema = z.object({
   durationMs: int().positive(),
 });
 
+export const SectorConfigSchema = z.object({
+  id: SectorSchema,
+  name: z.string(),
+  tileset: z.string(),
+  accent: z.string(),
+  music: z.string(),
+  bleedLevel: z.union([z.literal(0), z.literal(1), z.literal(2)]),
+  radioEnterBeat: z.enum(RADIO_BEATS),
+});
+
 export const VaultLogSchema = z.object({
   id: z.enum(LOG_IDS),
   sector: SectorSchema,
@@ -157,3 +167,4 @@ export type Mod = z.infer<typeof ModSchema>;
 export type ArmoryItem = z.infer<typeof ArmoryItemSchema>;
 export type RadioLine = z.infer<typeof RadioLineSchema>;
 export type VaultLog = z.infer<typeof VaultLogSchema>;
+export type SectorConfig = z.infer<typeof SectorConfigSchema>;

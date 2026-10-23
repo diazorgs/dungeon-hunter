@@ -24,6 +24,24 @@
     "doors": ["N", "E", "S", "W"]
   },
   {
+    "id": "combat-s1-03",
+    "roomType": "combat",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s1-04",
+    "roomType": "combat",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s1-05",
+    "roomType": "combat",
+    "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
     "id": "log",
     "roomType": "log",
     "sectors": [1],

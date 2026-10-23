@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Storage Wing",
+    "tileset": "tiles-s1",
+    "accent": "amber-500",
+    "music": "music.sector1",
+    "bleedLevel": 0,
+    "radioEnterBeat": "s1-enter"
+  },
+  {
+    "id": 2,
+    "name": "Conduit Works",
+    "tileset": "tiles-s2",
+    "accent": "teal-400",
+    "music": "music.sector2",
+    "bleedLevel": 1,
+    "radioEnterBeat": "s2-enter"
+  },
+  {
+    "id": 3,
+    "name": "Core Approach",
+    "tileset": "tiles-s3",
+    "accent": "bleed-500",
+    "music": "music.sector3",
+    "bleedLevel": 2,
+    "radioEnterBeat": "s3-enter"
+  }
+]

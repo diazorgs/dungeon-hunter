@@ -8,6 +8,8 @@ export interface AiWorld {
   scene: Phaser.Scene;
   player: Player;
   enemyBullets: BulletPool;
+  /** Line of sight against walls. */
+  canSee(from: Vec2, to: Vec2): boolean;
   /** Positions of other live guardians, for separation. */
   neighbours(self: Guardian): Vec2[];
 }

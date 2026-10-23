@@ -246,16 +246,17 @@ Tests sit next to each module as `*.test.ts` and run with `vp test`.
 
 IDs are kebab-case strings. Each ID set is an `as const` tuple in `schemas/ids.ts` (`WEAPON_IDS`, …) feeding `z.enum`, so `WeaponId`, `GuardianId`, `ModId`, `RunnerId`, `LogId`, `BossId` are literal unions; a test asserts each JSON file's IDs equal its tuple. Every JSON file is parsed through its Zod schema in a test so a bad edit fails CI.
 
-| File             | Schema             | Key fields                                                                                                                                              |
-| ---------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runners.json`   | `RunnerSchema`     | id, name, title, hp, shield, energy, skill { id, cooldownSec, durationSec }, unlockCost                                                                 |
-| `weapons.json`   | `WeaponSchema`     | id, name, type, rarity, energyPerShot, damage, fireRate, spreadDeg, projectileSpeed, pellets, behaviour, behaviourParams, shake, knockback, sfx, sprite |
-| `guardians.json` | `GuardianSchema`   | id, name, sectorMin, hp, speed, contactDamage, budgetCost, ai, attack {…}, scrap, energyOrbChance                                                       |
-| `bosses.json`    | `BossSchema`       | id, name, sector, hp, phases[] { id, untilHpPct, patterns[] }                                                                                           |
-| `mods.json`      | `ModSchema`        | id, name, description, inBasePool, effects: ModEffect[] (§6.2)                                                                                          |
-| `radio.json`     | `RadioLineSchema`  | id, beat, speaker ('ops'│'vigil'), text, durationMs                                                                                                     |
-| `logs.json`      | `VaultLogSchema`   | id, sector, title, lines[2..4]                                                                                                                          |
-| `armory.json`    | `ArmoryItemSchema` | itemType ('runner'│'weapon'│'mod'), itemId, cost                                                                                                        |
+| File             | Schema               | Key fields                                                                                                                                              |
+| ---------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runners.json`   | `RunnerSchema`       | id, name, title, hp, shield, energy, skill { id, cooldownSec, durationSec }, unlockCost                                                                 |
+| `weapons.json`   | `WeaponSchema`       | id, name, type, rarity, energyPerShot, damage, fireRate, spreadDeg, projectileSpeed, pellets, behaviour, behaviourParams, shake, knockback, sfx, sprite |
+| `guardians.json` | `GuardianSchema`     | id, name, sectorMin, hp, speed, contactDamage, budgetCost, ai, attack {…}, scrap, energyOrbChance                                                       |
+| `bosses.json`    | `BossSchema`         | id, name, sector, hp, phases[] { id, untilHpPct, patterns[] }, params { tunable attack numbers }                                                        |
+| `sectors.json`   | `SectorConfigSchema` | id, name, tileset, accent, music, bleedLevel, radioEnterBeat                                                                                            |
+| `mods.json`      | `ModSchema`          | id, name, description, inBasePool, effects: ModEffect[] (§6.2)                                                                                          |
+| `radio.json`     | `RadioLineSchema`    | id, beat, speaker ('ops'│'vigil'), text, durationMs                                                                                                     |
+| `logs.json`      | `VaultLogSchema`     | id, sector, title, lines[2..4]                                                                                                                          |
+| `armory.json`    | `ArmoryItemSchema`   | itemType ('runner'│'weapon'│'mod'), itemId, cost                                                                                                        |
 
 ### 6.1 Projectile behaviours
 
@@ -567,18 +568,19 @@ The palette is exported once as `packages/shared/src/palette.ts` (`PALETTE` as `
 
 ## 15. Decision log
 
-| #   | Decision                                                   | Reason                                                                        |
-| --- | ---------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| D1  | Pure logic folder with lint-enforced no-Phaser rule        | Testability; PRD test priorities are all logic                                |
-| D2  | `ProfileRepository` with local and API implementations     | Lets M5 ship full meta progression offline; M6 swaps the backend              |
-| D3  | Lift is a scene, not a grid room                           | Boss room must be a dead end; keeps generator simple                          |
-| D4  | `roomsCleared` counts combat rooms only                    | Makes the server cap (`6 × sector`) exact                                     |
-| D5  | Rejected runs are not stored                               | Leaderboard reads `runs` directly; nothing to filter                          |
-| D6  | Settings persisted server-side via `PUT /api/me/settings`  | PRD says `saves` stores settings in MVP; the endpoint list lacked it          |
-| D7  | BitmapText in Phaser, web font in React (same source font) | Canvas text blurs at 480×270                                                  |
-| D8  | One mod pick per sector, at the Lift                       | PRD lists both "after each sector boss" and "Lift"; they are the same moment  |
-| D9  | Internal packages consumed from source                     | No build step in the dev loop; Vite and Wrangler compile TS                   |
-| D10 | Arc Carbine is Common, not Rare                            | PRD promised pistol + 5 commons but listed 4; burst has no signature mechanic |
+| #   | Decision                                                   | Reason                                                                                |
+| --- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| D1  | Pure logic folder with lint-enforced no-Phaser rule        | Testability; PRD test priorities are all logic                                        |
+| D2  | `ProfileRepository` with local and API implementations     | Lets M5 ship full meta progression offline; M6 swaps the backend                      |
+| D3  | Lift is a scene, not a grid room                           | Boss room must be a dead end; keeps generator simple                                  |
+| D4  | `roomsCleared` counts combat rooms only                    | Makes the server cap (`6 × sector`) exact                                             |
+| D5  | Rejected runs are not stored                               | Leaderboard reads `runs` directly; nothing to filter                                  |
+| D6  | Settings persisted server-side via `PUT /api/me/settings`  | PRD says `saves` stores settings in MVP; the endpoint list lacked it                  |
+| D7  | BitmapText in Phaser, web font in React (same source font) | Canvas text blurs at 480×270                                                          |
+| D8  | One mod pick per sector, at the Lift                       | PRD lists both "after each sector boss" and "Lift"; they are the same moment          |
+| D9  | Internal packages consumed from source                     | No build step in the dev loop; Vite and Wrangler compile TS                           |
+| D11 | Sector transition = scene restart with a carry object      | Restart guarantees every old object and collider is gone; RunState + HP/loadout carry |
+| D10 | Arc Carbine is Common, not Rare                            | PRD promised pistol + 5 commons but listed 4; burst has no signature mechanic         |
 
 ## 16. Open questions
 

@@ -45,7 +45,13 @@
     "contactDamage": 1,
     "budgetCost": 2,
     "ai": "turret",
-    "attack": {},
+    "attack": {
+      "volleyEveryMs": 1600,
+      "spreadCount": 3,
+      "spreadArcDeg": 30,
+      "boltSpeed": 100,
+      "windupMs": 400
+    },
     "scrap": 2,
     "energyOrbChance": 0.4
   },

@@ -1,0 +1,238 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.11.0",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "width": 15,
+  "height": 11,
+  "tilewidth": 16,
+  "tileheight": 16,
+  "infinite": false,
+  "compressionlevel": -1,
+  "nextlayerid": 5,
+  "nextobjectid": 10,
+  "properties": [
+    {
+      "name": "roomType",
+      "type": "string",
+      "value": "combat"
+    },
+    {
+      "name": "sectors",
+      "type": "string",
+      "value": "1"
+    },
+    {
+      "name": "doors",
+      "type": "string",
+      "value": "N,E,S,W"
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "name": "tiles-s1",
+      "image": "../tiles-s1.png",
+      "imagewidth": 96,
+      "imageheight": 16,
+      "tilewidth": 16,
+      "tileheight": 16,
+      "tilecount": 6,
+      "columns": 6,
+      "margin": 0,
+      "spacing": 0,
+      "tiles": [
+        {
+          "id": 2,
+          "properties": [
+            {
+              "name": "collides",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "layers": [
+    {
+      "id": 1,
+      "name": "floor",
+      "type": "tilelayer",
+      "x": 0,
+      "y": 0,
+      "width": 15,
+      "height": 11,
+      "opacity": 1,
+      "visible": true,
+      "data": [
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+      ]
+    },
+    {
+      "id": 2,
+      "name": "walls",
+      "type": "tilelayer",
+      "x": 0,
+      "y": 0,
+      "width": 15,
+      "height": 11,
+      "opacity": 1,
+      "visible": true,
+      "data": [
+        3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 0, 3, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 0, 3, 3, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3,
+        3, 0, 0, 0, 3, 3, 3, 3, 3, 3
+      ]
+    },
+    {
+      "id": 3,
+      "name": "decor",
+      "type": "tilelayer",
+      "x": 0,
+      "y": 0,
+      "width": 15,
+      "height": 11,
+      "opacity": 1,
+      "visible": true,
+      "data": [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "opacity": 1,
+      "visible": true,
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "",
+          "type": "guardian",
+          "x": 40,
+          "y": 40,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "",
+          "type": "guardian",
+          "x": 200,
+          "y": 136,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "",
+          "type": "guardian",
+          "x": 40,
+          "y": 136,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "",
+          "type": "guardian",
+          "x": 88,
+          "y": 88,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "",
+          "type": "guardian",
+          "x": 152,
+          "y": 88,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "",
+          "type": "guardian",
+          "x": 200,
+          "y": 88,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 7,
+          "name": "",
+          "type": "guardian",
+          "x": 40,
+          "y": 88,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 8,
+          "name": "",
+          "type": "guardian",
+          "x": 120,
+          "y": 88,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 9,
+          "name": "",
+          "type": "crate",
+          "x": 40,
+          "y": 152,
+          "point": true,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true
+        }
+      ]
+    }
+  ]
+}

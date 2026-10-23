@@ -7,6 +7,7 @@ import type { GuardianSpawnOpts } from "../entities/Guardian.ts";
 import type { Player } from "../entities/Player.ts";
 import type { AimTarget } from "../logic/combat/aim.ts";
 import type { Vec2 } from "../logic/input.ts";
+import { lineClear } from "../logic/los.ts";
 import type { AiWorld } from "./ai/AiController.ts";
 import { getAi } from "./ai/registry.ts";
 import type { BulletPool } from "./BulletPool.ts";
@@ -39,6 +40,7 @@ export class GuardianSystem {
       player,
       enemyBullets: pools.enemy,
       neighbours: (self) => this.alive().filter((g) => g !== self),
+      canSee: (from, to) => lineClear(blocked, from, to),
     };
     const physics = scene.physics.add;
     physics.collider(this.group, walls);

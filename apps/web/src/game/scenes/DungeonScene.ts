@@ -1,11 +1,21 @@
-import { RUNNERS } from "@dh/shared";
+import { RADIO, RUNNERS, SECTORS } from "@dh/shared";
 import { createRng } from "@dh/utils";
 import Phaser from "phaser";
 import { bus } from "../bridge/bus.ts";
 import type { RunConfig } from "../bridge/types.ts";
 import type { HudSource } from "../hud/HudSource.ts";
 import { roomAt } from "../logic/camera.ts";
-import { createRunState, endRun, onBossKilled, tickTime } from "../logic/run/runState.ts";
+import {
+  advanceSector,
+  createRunState,
+  endRun,
+  onBossKilled,
+  tickTime,
+} from "../logic/run/runState.ts";
+import { heal } from "../logic/combat/combatant.ts";
+import type { CombatantState } from "../logic/combat/combatant.ts";
+import type { Loadout } from "../logic/weapons/loadout.ts";
+import { LiftPad } from "../entities/LiftPad.ts";
 import type { RunState } from "../logic/run/runState.ts";
 import { toRunResult, toRunSummary } from "../logic/run/summary.ts";
 import { LootSystem } from "../systems/LootSystem.ts";
@@ -26,7 +36,13 @@ import { InputSystem } from "../systems/InputSystem.ts";
 import { buildSector } from "../systems/SectorBuilder.ts";
 import { SceneKey } from "./keys.ts";
 
-const SECTOR = 1;
+/** What survives a sector rebuild besides RunState (which holds mods, Scrap and progress). */
+interface Carry {
+  combat: Pick<CombatantState, "hp" | "shield" | "energy">;
+  loadout: Loadout;
+}
+const LIFT_RANGE = 20;
+const LIFT_HEAL = 2;
 const SECTOR_BOSS: Record<SectorId, BossId> = {
   1: "gatekeeper",
   2: "conduit-hydra",
@@ -43,6 +59,7 @@ export class DungeonScene extends Phaser.Scene {
   private camDirector!: CameraDirector;
   private encounters!: EncounterSystem;
   private readonly visited = new Set<number>();
+  private lift: LiftPad | null = null;
   world!: CombatWorld;
 
   constructor() {
@@ -57,7 +74,15 @@ export class DungeonScene extends Phaser.Scene {
       (this.registry.get("runState") as RunState | undefined) ?? createRunState(this.runConfig);
     this.registry.set("runState", this.run);
     this.ending = false;
+    this.lift = null;
+    const SECTOR = this.run.sector;
     this.cameras.main.setRoundPixels(true);
+    // scene.events survives a restart: drop our domain:verb listeners so nothing doubles up.
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      for (const name of this.events.eventNames())
+        if (typeof name === "string" && name.includes(":")) this.events.removeAllListeners(name);
+      this.events.off(Phaser.Scenes.Events.RESUME, this.onResume);
+    });
 
     const layout = assignTemplates(
       generateSector(seed, SECTOR),
@@ -102,7 +127,11 @@ export class DungeonScene extends Phaser.Scene {
     this.events.on("boss:room", (d: { x: number; y: number }) =>
       this.world.bosses.start(SECTOR_BOSS[SECTOR], d.x, d.y),
     );
-    this.events.on("boss:dead", (d: { id: BossId }) => onBossKilled(this.run, d.id));
+    this.events.on("boss:dead", (d: { id: BossId }) => {
+      onBossKilled(this.run, d.id);
+      const at = sector.spawns.find((sp) => sp.kind === "lift");
+      if (d.id !== "core-warden" && at) this.lift = new LiftPad(this, at.x, at.y);
+    });
     this.events.on("player:died", () => this.die());
     if (import.meta.env.DEV)
       Object.assign((window as unknown as { __dh: object }).__dh, {
@@ -125,11 +154,27 @@ export class DungeonScene extends Phaser.Scene {
     this.registry.set("hudSource", source);
     this.game.events.emit("hud:rebind");
 
-    // Keys pressed while paused must not replay on resume.
-    this.events.on(Phaser.Scenes.Events.RESUME, () => this.input$.reset());
+    this.events.on(Phaser.Scenes.Events.RESUME, this.onResume);
 
-    if (import.meta.env.DEV) this.input.keyboard?.on("keydown-F9", () => this.abandon());
+    // Sector carry-over: HP, shield, energy and held weapons (mods were re-applied by ModSystem).
+    const carry = this.registry.get("carry") as Carry | undefined;
+    if (carry) {
+      Object.assign(this.world.player.combat, carry.combat);
+      Object.assign(this.world.weapons.loadout, structuredClone(carry.loadout));
+      this.registry.remove("carry");
+    }
+    const beat = SECTORS[SECTOR].radioEnterBeat;
+    for (const line of RADIO.filter((l) => l.beat === beat)) this.events.emit("radio:say", line);
+    this.events.emit("sector:entered", { sector: SECTOR });
+
+    if (import.meta.env.DEV) {
+      this.input.keyboard?.on("keydown-F9", () => this.abandon());
+      this.input.keyboard?.on("keydown-F8", () => this.rebuildSector());
+    }
   }
+
+  // Keys pressed while paused must not replay on resume.
+  private readonly onResume = () => this.input$.reset();
 
   update(time: number, delta: number) {
     const dt = delta / 1000;
@@ -137,6 +182,15 @@ export class DungeonScene extends Phaser.Scene {
     tickTime(this.run, delta, false);
     const input = this.input$.read(this.cameras.main, this.world.player);
     if (this.loot.tryInteract(input)) input.interact = false;
+    const p = this.world.player;
+    if (
+      input.interact &&
+      this.lift &&
+      Math.hypot(this.lift.x - p.x, this.lift.y - p.y) <= LIFT_RANGE
+    ) {
+      input.interact = false;
+      this.startLift();
+    }
     this.world.update(input, time, dt, this.runConfig.settings.aimMode);
     this.loot.update();
     this.encounters.update(this.world.player);
@@ -154,6 +208,50 @@ export class DungeonScene extends Phaser.Scene {
     const id = await hud.modPick.open(choices, { cancellable, gold: cancellable });
     this.input$.blocked = false;
     return id;
+  }
+
+  /** Lift: freeze the world, heal 2 HP, a non-cancellable mod pick, then descend. */
+  private startLift(): void {
+    this.lift?.destroy();
+    this.lift = null;
+    heal(this.world.player.combat, LIFT_HEAL);
+    const rng = createRng(this.runConfig.seed).fork(`mods:lift:s${this.run.sector}`);
+    const choices = rollModChoices(
+      rng,
+      modPool(this.runConfig.unlockedModIds),
+      this.world.player.stats,
+    );
+    this.scene.launch(SceneKey.Lift, { choices, from: this.run.sector });
+    this.scene.pause();
+  }
+
+  /** Called by LiftScene after the pick. */
+  descend(): void {
+    const next = (this.run.sector + 1) as SectorId;
+    const hasNext =
+      next <= 3 && ROOM_CATALOG.some((t) => t.roomType === "start" && t.sectors.includes(next));
+    if (!hasNext) {
+      // Sectors 2–3 arrive in plan 19; until then the slice ends here.
+      if (import.meta.env.DEV) console.info("Slice complete");
+      this.abandon();
+      return;
+    }
+    advanceSector(this.run);
+    this.rebuildSector();
+  }
+
+  /** Restart the scene on the run's current sector, carrying the Runner over. */
+  rebuildSector(): void {
+    const carry: Carry = {
+      combat: {
+        hp: this.world.player.combat.hp,
+        shield: this.world.player.combat.shield,
+        energy: this.world.player.combat.energy,
+      },
+      loadout: structuredClone(this.world.weapons.loadout),
+    };
+    this.registry.set("carry", carry);
+    this.scene.restart();
   }
 
   /** Pause menu → Abandon (and F9 in DEV). */

@@ -44,6 +44,7 @@ export class Guardian extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     if (opts.elite) this.setScale(1.5);
     if (opts.bleed) this.setTint(PALETTE["bleed-500"]);
+    if (def.speed === 0) this.setImmovable(true);
   }
 
   /** Busy = stunned or mid-knockback: no steering, no attacks, still hittable. */
@@ -55,7 +56,8 @@ export class Guardian extends Phaser.Physics.Arcade.Sprite {
   takeHit(dmg: number, knockback: number, fromAngle: number, now: number, stunMs = 0): boolean {
     if (this.health.dead) return false;
     const { dealt, killed } = damageEnemy(this.health, dmg);
-    if (knockback > 0) {
+    // Stationary guardians (Turret Node) ignore knockback.
+    if (knockback > 0 && this.def.speed > 0) {
       // Velocity impulse, so the wall collider stops it instead of pushing it through.
       this.setVelocity(Math.cos(fromAngle) * knockback, Math.sin(fromAngle) * knockback);
       this.knockedUntil = now + KNOCKBACK_MS;

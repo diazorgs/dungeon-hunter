@@ -2,10 +2,12 @@ import type { Guardian } from "@dh/shared";
 import type { AiFactory } from "./AiController.ts";
 import { HoverShooterAi } from "./HoverShooterAi.ts";
 import { RusherAi } from "./RusherAi.ts";
+import { TurretAi } from "./TurretAi.ts";
 
 const factories = new Map<Guardian["ai"], AiFactory>([
   ["hover-shooter", (g, w) => new HoverShooterAi(g, w)],
   ["rusher", (g, w) => new RusherAi(g, w)],
+  ["turret", (g, w) => new TurretAi(g, w)],
 ]);
 
 export function getAi(id: Guardian["ai"]): AiFactory {

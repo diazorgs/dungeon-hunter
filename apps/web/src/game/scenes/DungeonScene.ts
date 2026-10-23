@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import { bus } from "../bridge/bus.ts";
+import { RUNNERS } from "@dh/shared";
 import type { RunConfig } from "../bridge/types.ts";
+import { RunnerRig } from "../systems/RunnerRig.ts";
 import { InputSystem } from "../systems/InputSystem.ts";
 import { buildPlaceholderRoom } from "../systems/placeholderRoom.ts";
 import { SceneKey } from "./keys.ts";
@@ -10,6 +12,8 @@ export class DungeonScene extends Phaser.Scene {
   private input$!: InputSystem;
   private runConfig!: RunConfig;
   private startedAt = 0;
+  /** Read by the HUD scene. */
+  rig!: RunnerRig;
 
   constructor() {
     super(SceneKey.Dungeon);
@@ -19,8 +23,12 @@ export class DungeonScene extends Phaser.Scene {
     this.runConfig = this.registry.get("runConfig") as RunConfig;
     this.startedAt = this.time.now;
     this.cameras.main.setRoundPixels(true);
-    buildPlaceholderRoom(this, 15, 11);
+    const room = buildPlaceholderRoom(this, 15, 11);
     this.input$ = new InputSystem(this);
+    this.rig = new RunnerRig(this, RUNNERS[this.runConfig.runnerId], room.walls, {
+      x: room.inner.centerX,
+      y: room.inner.centerY,
+    });
     // Keys pressed while paused must not replay on resume.
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.input$.reset());
 
@@ -33,8 +41,9 @@ export class DungeonScene extends Phaser.Scene {
       );
   }
 
-  update() {
-    const input = this.input$.read(this.cameras.main, { x: 240, y: 135 });
+  update(time: number, delta: number) {
+    const input = this.input$.read(this.cameras.main, this.rig.player);
+    this.rig.update(input, time, delta / 1000, this.runConfig.settings.aimMode);
     if (input.pause) {
       this.scene.launch(SceneKey.Pause, { from: SceneKey.Dungeon });
       this.scene.pause();

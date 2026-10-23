@@ -1,7 +1,11 @@
+import { RUNNERS } from "@dh/shared";
 import Phaser from "phaser";
+import type { RunConfig } from "../bridge/types.ts";
+import { isActive } from "../logic/combat/buffs.ts";
 import { parseDevParams } from "../logic/devParams.ts";
 import { InputSystem } from "../systems/InputSystem.ts";
 import { buildPlaceholderRoom } from "../systems/placeholderRoom.ts";
+import { RunnerRig } from "../systems/RunnerRig.ts";
 import { SceneKey } from "./keys.ts";
 
 const RING = 300;
@@ -12,6 +16,8 @@ export class SandboxScene extends Phaser.Scene {
   private bullets!: Phaser.Physics.Arcade.Group;
   private info!: Phaser.GameObjects.Text;
   private god = false;
+  private rig!: RunnerRig;
+  private runConfig!: RunConfig;
 
   constructor() {
     super(SceneKey.Sandbox);
@@ -19,8 +25,15 @@ export class SandboxScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setRoundPixels(true);
-    buildPlaceholderRoom(this, 15, 11);
+    this.runConfig = this.registry.get("runConfig") as RunConfig;
+    const room = buildPlaceholderRoom(this, 15, 11);
+    // An inner pillar to test wall collision and line of sight.
+    room.walls.create(room.inner.centerX + 48, room.inner.centerY, "ph-wall").setDepth(10);
     this.input$ = new InputSystem(this);
+    this.rig = new RunnerRig(this, RUNNERS[this.runConfig.runnerId], room.walls, {
+      x: room.inner.centerX,
+      y: room.inner.centerY,
+    });
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.input$.reset());
     this.god = parseDevParams(location.search).god ?? false;
     this.bullets = this.physics.add.group({ defaultKey: "ph-bullet-enemy", maxSize: 768 });
@@ -50,8 +63,9 @@ export class SandboxScene extends Phaser.Scene {
     (b as Phaser.Physics.Arcade.Image).disableBody(true, true);
   }
 
-  update() {
-    const input = this.input$.read(this.cameras.main, { x: 240, y: 135 });
+  update(time: number, delta: number) {
+    const input = this.input$.read(this.cameras.main, this.rig.player);
+    this.rig.update(input, time, delta / 1000, this.runConfig.settings.aimMode);
     if (input.pause) {
       this.scene.launch(SceneKey.Pause, { from: SceneKey.Sandbox });
       this.scene.pause();
@@ -68,6 +82,7 @@ export class SandboxScene extends Phaser.Scene {
         "1 ring  2 clear  G god  Esc pause",
         `${input.device} move ${m.x.toFixed(2)},${m.y.toFixed(2)} aim ${input.aimWorld.x.toFixed(0)},${input.aimWorld.y.toFixed(0)}`,
         `fire ${+input.fire} skill ${+input.skill} dash ${+input.dash} swap ${+input.swap} use ${+input.interact} map ${+input.map}`,
+        `skill ${(this.rig.skills.cooldown.remaining(time) / 1000).toFixed(1)}s  overcharge ${isActive(this.rig.player.buffs, "overcharge", time) ? "ON" : "-"}  dash ${this.rig.player.dashCharges(time)}`,
       ].join("\n"),
     );
   }

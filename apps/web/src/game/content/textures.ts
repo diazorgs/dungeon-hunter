@@ -72,6 +72,16 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
   ],
   "ph-weapon": [12, 4, (_, f) => f(PALETTE["steel-300"], 0, 0, 12, 4)],
   "ph-pickup": [6, 6, (_, f) => f(PALETTE.energy, 0, 0, 6, 6)],
+  "ph-crosshair": [
+    7,
+    7,
+    (_, f) => (
+      f(PALETTE.bone, 3, 0, 1, 2),
+      f(PALETTE.bone, 3, 5, 1, 2),
+      f(PALETTE.bone, 0, 3, 2, 1),
+      f(PALETTE.bone, 5, 3, 2, 1)
+    ),
+  ],
   "ph-bullet-player": [3, 3, (_, f) => f(PALETTE["amber-300"], 0, 0, 3, 3)],
   "ph-bullet-enemy": [
     5,

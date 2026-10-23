@@ -219,9 +219,9 @@ Bindings (fixed, no remapping in MVP): WASD, mouse aim, LMB fire, RMB/Space skil
 
 | Module                | Key exports                                                                     |
 | --------------------- | ------------------------------------------------------------------------------- |
-| `combat/damage.ts`    | `applyDamage(state, amount, now) → DamageResult`, `tickShieldRegen(state, now)` |
+| `combat/combatant.ts` | `applyDamage(state, amount, now) → DamageResult`, `tickShieldRegen(state, now)` |
 | `combat/stats.ts`     | `deriveStats(base, mods) → PlayerStats`                                         |
-| `combat/aim.ts`       | `assistAngle(origin, aimAngle, targets, mode) → number`                         |
+| `combat/aim.ts`       | `assistAngle(origin, cursor, targets, mode, prevAngle) → number`                |
 | `dungeon/generate.ts` | `generateSector(seed, sector, opts) → DungeonLayout`                            |
 | `dungeon/validate.ts` | `isReachable(layout)`, `validateLayout(layout) → string[]`                      |
 | `encounter/budget.ts` | `roomBudget(sector, roomsCleared)`, `buildWaves(budget, pool, rng) → Wave[]`    |
@@ -303,7 +303,7 @@ Values from the PRD are starting values; tuning changes JSON, not code.
 
 ### 7.2 Aim
 
-- `soft` (default): at fire time, if an enemy lies within 24 px of the cursor and within ±8° of the aim angle, rotate the shot toward it, clamped to 8°.
+- `soft` (default): if a visible enemy lies within 24 px of the cursor, bend the aim toward the one closest to the cursor, clamped to 8°.
 - `full`: aim at the nearest visible enemy within 160 px; fall back to cursor.
 
 ### 7.3 Dungeon

@@ -32,6 +32,7 @@ export class SandboxScene extends Phaser.Scene {
     this.world = new CombatWorld(
       this,
       RUNNERS[this.runConfig.runnerId],
+      this.runConfig.settings,
       room.walls,
       {
         x: room.inner.centerX,

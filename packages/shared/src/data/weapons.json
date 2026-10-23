@@ -13,11 +13,11 @@
     "behaviour": "bullet",
     "behaviourParams": {},
     "shake": {
-      "intensity": 0.002,
-      "durationMs": 40
+      "intensity": 0.003,
+      "durationMs": 50
     },
     "knockback": 20,
-    "sfx": "sfx-rust-pistol",
+    "sfx": "sfx.pistol",
     "sprite": "rust-pistol"
   },
   {
@@ -42,7 +42,7 @@
       "durationMs": 60
     },
     "knockback": 60,
-    "sfx": "sfx-shock-baton",
+    "sfx": "sfx.melee",
     "sprite": "shock-baton"
   },
   {
@@ -63,7 +63,7 @@
       "durationMs": 40
     },
     "knockback": 10,
-    "sfx": "sfx-rivet-smg",
+    "sfx": "sfx.smg",
     "sprite": "rivet-smg"
   },
   {
@@ -84,7 +84,7 @@
       "durationMs": 90
     },
     "knockback": 120,
-    "sfx": "sfx-breach-shotgun",
+    "sfx": "sfx.shotgun",
     "sprite": "breach-shotgun"
   },
   {
@@ -107,7 +107,7 @@
       "durationMs": 60
     },
     "knockback": 40,
-    "sfx": "sfx-line-rifle",
+    "sfx": "sfx.rifle",
     "sprite": "line-rifle"
   },
   {
@@ -131,7 +131,7 @@
       "durationMs": 50
     },
     "knockback": 20,
-    "sfx": "sfx-arc-carbine",
+    "sfx": "sfx.burst",
     "sprite": "arc-carbine"
   },
   {
@@ -154,7 +154,7 @@
       "durationMs": 90
     },
     "knockback": 80,
-    "sfx": "sfx-scatter-coil",
+    "sfx": "sfx.shotgun",
     "sprite": "scatter-coil"
   },
   {
@@ -181,7 +181,7 @@
       "durationMs": 30
     },
     "knockback": 0,
-    "sfx": "sfx-pulse-lance",
+    "sfx": "sfx.beam-loop",
     "sprite": "pulse-lance"
   },
   {
@@ -206,7 +206,7 @@
       "durationMs": 60
     },
     "knockback": 60,
-    "sfx": "sfx-grid-cutter",
+    "sfx": "sfx.melee",
     "sprite": "grid-cutter"
   },
   {
@@ -230,7 +230,7 @@
       "durationMs": 120
     },
     "knockback": 100,
-    "sfx": "sfx-fuse-launcher",
+    "sfx": "sfx.launcher",
     "sprite": "fuse-launcher"
   },
   {
@@ -255,7 +255,7 @@
       "durationMs": 40
     },
     "knockback": 10,
-    "sfx": "sfx-static-repeater",
+    "sfx": "sfx.chain",
     "sprite": "static-repeater"
   },
   {
@@ -280,7 +280,7 @@
       "durationMs": 120
     },
     "knockback": 140,
-    "sfx": "sfx-null-cannon",
+    "sfx": "sfx.charge",
     "sprite": "null-cannon"
   }
 ]

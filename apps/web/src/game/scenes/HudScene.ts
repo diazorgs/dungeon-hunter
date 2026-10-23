@@ -1,30 +1,119 @@
+import { PALETTE, WEAPONS } from "@dh/shared";
+import type { WeaponId } from "@dh/shared";
 import Phaser from "phaser";
-import type { DungeonScene } from "./DungeonScene.ts";
+import { BossBar } from "../hud/BossBar.ts";
+import { FullMap } from "../hud/FullMap.ts";
+import type { HudSource } from "../hud/HudSource.ts";
+import { Minimap } from "../hud/Minimap.ts";
+import { RadioBox } from "../hud/RadioBox.ts";
+import type { RadioLineIn } from "../hud/RadioBox.ts";
+import { ResourceBars } from "../hud/ResourceBars.ts";
+import { ScrapCounter } from "../hud/ScrapCounter.ts";
+import { SkillRing } from "../hud/SkillRing.ts";
+import { Vignette } from "../hud/Vignette.ts";
+import { WeaponSlots } from "../hud/WeaponSlots.ts";
+import { effectiveEnergyCost } from "../logic/combat/buffs.ts";
+import { minimapCells } from "../logic/minimap.ts";
 import { SceneKey } from "./keys.ts";
 
-/** Screen-space HUD, runs parallel to the dungeon (filled in plan 11). */
+/** Screen-space HUD, parallel to the world scene, so camera shake never moves it. */
 export class HudScene extends Phaser.Scene {
+  private source: HudSource | null = null;
+  private bars!: ResourceBars;
+  private scrap!: ScrapCounter;
+  private minimap!: Minimap;
+  private fullMap!: FullMap;
+  private weapons!: WeaponSlots;
+  private skill!: SkillRing;
+  radio!: RadioBox;
+  private bossBar!: BossBar;
+  private vignette!: Vignette;
+  private unbind: (() => void) | null = null;
+
   constructor() {
     super(SceneKey.Hud);
   }
 
-  private text!: Phaser.GameObjects.Text;
-
   create() {
-    this.text = this.add
-      .text(4, 4, "", { fontFamily: "monospace", fontSize: "8px", color: "#a9b8d1" })
-      .setResolution(4);
+    const { width, height } = this.scale;
+    this.vignette = new Vignette(this);
+    this.bars = new ResourceBars(this, 4, 4);
+    this.scrap = new ScrapCounter(this, 4, 26);
+    this.minimap = new Minimap(this, width - 68, 4);
+    this.weapons = new WeaponSlots(this, width - 60, height - 52);
+    this.skill = new SkillRing(this, width - 52, height - 14);
+    this.radio = new RadioBox(this);
+    this.bossBar = new BossBar(this);
+    this.fullMap = new FullMap(this);
+
+    this.input.keyboard?.on("keydown-TAB", () => {
+      if (this.source && !this.scene.isPaused(SceneKey.Dungeon)) this.fullMap.toggle();
+    });
+    const rebind = () => this.bind(this.registry.get("hudSource") as HudSource | undefined);
+    this.game.events.on("hud:rebind", rebind);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
+      this.game.events.off("hud:rebind", rebind),
+    );
+    rebind();
+
+    if (import.meta.env.DEV)
+      this.input.keyboard?.on("keydown-F7", () => {
+        this.radio.say({
+          speaker: "ops",
+          text: "Runner, you're in. Storage Wing ahead.",
+          durationMs: 2500,
+        });
+        this.radio.say({ speaker: "vigil", text: "INTRUDER DETECTED.", durationMs: 2000 });
+        this.radio.say({ speaker: "ops", text: "Ignore it. Keep moving.", durationMs: 2000 });
+      });
   }
 
-  // shortcut: placeholder text readout; plan 11 replaces it with bars and the cooldown ring.
+  /** Re-attach to a (new) world; safe to call repeatedly, never duplicates listeners. */
+  private bind(source: HudSource | undefined): void {
+    this.unbind?.();
+    this.source = source ?? null;
+    if (!source) return;
+    const ev = source.events;
+    const handlers: [string, (...a: never[]) => void][] = [
+      ["room:entered", () => this.renderMaps()],
+      ["room:locked", (d: { type?: string }) => d.type === "boss" && this.fullMap.close()],
+      [Phaser.Scenes.Events.PAUSE, () => this.fullMap.close()],
+      ["hud:vignette", () => this.vignette.pulse(PALETTE["hp-dark"], 150)],
+      [
+        "boss:spawned",
+        (d: { name: string; maxHp: number; phaseMarkers?: number[] }) =>
+          this.bossBar.show(d.name, d.maxHp, d.phaseMarkers),
+      ],
+      ["boss:hp", (d: { hp: number }) => this.bossBar.update(d.hp)],
+      ["boss:dead", () => this.bossBar.hide()],
+      ["radio:say", (line: RadioLineIn) => this.radio.say(line)],
+    ];
+    for (const [e, fn] of handlers) ev.on(e, fn);
+    this.unbind = () => handlers.forEach(([e, fn]) => ev.off(e, fn));
+    this.fullMap.close();
+    this.bossBar.hide();
+    this.renderMaps();
+  }
+
+  private renderMaps(): void {
+    const s = this.source;
+    if (!s) return;
+    const cells = minimapCells(s.layout, s.visitedRooms, s.currentRoom());
+    this.minimap.render(cells);
+    this.fullMap.render(cells);
+  }
+
   update(time: number) {
-    const world = (this.scene.get(SceneKey.Dungeon) as DungeonScene).world;
-    if (!world) return;
-    const c = world.player.combat;
-    const cd = world.skills.cooldown.remaining(time);
-    this.text.setText(
-      `HP ${c.hp}/${c.maxHp}  SH ${c.shield}/${c.maxShield}  EN ${c.energy}\n` +
-        `SKILL ${cd > 0 ? `${Math.ceil(cd / 1000)}s` : "ready"}`,
+    this.radio.update(time);
+    const s = this.source;
+    if (!s) return;
+    const now = s.player.scene.time.now;
+    this.bars.update(s.player.combat);
+    this.scrap.update(s.scrap());
+    this.weapons.update(s.weapons.loadout, (id: WeaponId) =>
+      effectiveEnergyCost(WEAPONS[id].energyPerShot, s.player.buffs, now),
     );
+    const cd = s.skills.cooldown;
+    this.skill.update(cd.progress(now), cd.remaining(now) / 1000);
   }
 }

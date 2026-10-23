@@ -3,6 +3,8 @@ import { createRng } from "@dh/utils";
 import Phaser from "phaser";
 import { bus } from "../bridge/bus.ts";
 import type { RunConfig } from "../bridge/types.ts";
+import type { HudSource } from "../hud/HudSource.ts";
+import { roomAt } from "../logic/camera.ts";
 import { loadedTemplates, ROOM_CATALOG, TILES, TILESET_KEY } from "../content/rooms.ts";
 import { composeSector, TILE_PX, wallAt } from "../logic/dungeon/compose.ts";
 import { generateSector } from "../logic/dungeon/generate.ts";
@@ -23,7 +25,7 @@ export class DungeonScene extends Phaser.Scene {
   private startedAt = 0;
   private camDirector!: CameraDirector;
   private encounters!: EncounterSystem;
-  /** Read by the HUD scene. */
+  private readonly visited = new Set<number>();
   world!: CombatWorld;
 
   constructor() {
@@ -62,6 +64,22 @@ export class DungeonScene extends Phaser.Scene {
       sectorId: SECTOR,
       seed,
     });
+    this.visited.clear();
+    this.events.on("room:entered", (d: { roomId: number }) => this.visited.add(d.roomId));
+    const source: HudSource = {
+      player: this.world.player,
+      weapons: this.world.weapons,
+      skills: this.world.skills,
+      layout,
+      visitedRooms: this.visited,
+      currentRoom: () => roomAt(this.world.player, sector.rooms),
+      scrap: () => 0,
+      sector: SECTOR,
+      events: this.events,
+    };
+    this.registry.set("hudSource", source);
+    this.game.events.emit("hud:rebind");
+
     // Keys pressed while paused must not replay on resume.
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.input$.reset());
 

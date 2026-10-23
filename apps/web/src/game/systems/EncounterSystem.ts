@@ -88,7 +88,7 @@ export class EncounterSystem {
     };
     for (const d of this.roomDoors(room.id)) d.lock();
     this.pushOutOfDoors(player, room.id);
-    this.scene.events.emit("room:locked", { roomId: room.id });
+    this.scene.events.emit("room:locked", { roomId: room.id, type: room.type });
   }
 
   private nextWave(player: Player): void {

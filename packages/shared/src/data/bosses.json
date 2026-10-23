@@ -1,0 +1,23 @@
+[
+  {
+    "id": "gatekeeper",
+    "name": "Gatekeeper",
+    "sector": 1,
+    "hp": 400,
+    "phases": []
+  },
+  {
+    "id": "conduit-hydra",
+    "name": "Conduit Hydra",
+    "sector": 2,
+    "hp": 750,
+    "phases": []
+  },
+  {
+    "id": "core-warden",
+    "name": "Core Warden",
+    "sector": 3,
+    "hp": 1200,
+    "phases": []
+  }
+]

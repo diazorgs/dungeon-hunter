@@ -1,0 +1,57 @@
+[
+  {
+    "itemType": "runner",
+    "itemId": "kit",
+    "cost": 300
+  },
+  {
+    "itemType": "weapon",
+    "itemId": "arc-carbine",
+    "cost": 80
+  },
+  {
+    "itemType": "weapon",
+    "itemId": "scatter-coil",
+    "cost": 80
+  },
+  {
+    "itemType": "weapon",
+    "itemId": "pulse-lance",
+    "cost": 80
+  },
+  {
+    "itemType": "weapon",
+    "itemId": "grid-cutter",
+    "cost": 80
+  },
+  {
+    "itemType": "weapon",
+    "itemId": "fuse-launcher",
+    "cost": 80
+  },
+  {
+    "itemType": "weapon",
+    "itemId": "static-repeater",
+    "cost": 150
+  },
+  {
+    "itemType": "weapon",
+    "itemId": "null-cannon",
+    "cost": 150
+  },
+  {
+    "itemType": "mod",
+    "itemId": "thorn-plating",
+    "cost": 60
+  },
+  {
+    "itemType": "mod",
+    "itemId": "lucky-seal",
+    "cost": 60
+  },
+  {
+    "itemType": "mod",
+    "itemId": "dash-coil",
+    "cost": 60
+  }
+]

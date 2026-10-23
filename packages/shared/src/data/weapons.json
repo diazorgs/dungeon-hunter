@@ -1,0 +1,286 @@
+[
+  {
+    "id": "rust-pistol",
+    "name": "Rust Pistol",
+    "type": "pistol",
+    "rarity": "starter",
+    "energyPerShot": 0,
+    "damage": 3,
+    "fireRate": 4,
+    "spreadDeg": 3,
+    "projectileSpeed": 280,
+    "pellets": 1,
+    "behaviour": "bullet",
+    "behaviourParams": {},
+    "shake": {
+      "intensity": 0.002,
+      "durationMs": 40
+    },
+    "knockback": 20,
+    "sfx": "sfx-rust-pistol",
+    "sprite": "rust-pistol"
+  },
+  {
+    "id": "shock-baton",
+    "name": "Shock Baton",
+    "type": "melee",
+    "rarity": "common",
+    "energyPerShot": 0,
+    "damage": 4,
+    "fireRate": 2.5,
+    "spreadDeg": 0,
+    "projectileSpeed": 0,
+    "pellets": 1,
+    "behaviour": "melee-swing",
+    "behaviourParams": {
+      "arcDeg": 100,
+      "range": 22,
+      "stunSec": 0.5
+    },
+    "shake": {
+      "intensity": 0.003,
+      "durationMs": 60
+    },
+    "knockback": 60,
+    "sfx": "sfx-shock-baton",
+    "sprite": "shock-baton"
+  },
+  {
+    "id": "rivet-smg",
+    "name": "Rivet SMG",
+    "type": "automatic",
+    "rarity": "common",
+    "energyPerShot": 1,
+    "damage": 2,
+    "fireRate": 12,
+    "spreadDeg": 12,
+    "projectileSpeed": 300,
+    "pellets": 1,
+    "behaviour": "bullet",
+    "behaviourParams": {},
+    "shake": {
+      "intensity": 0.002,
+      "durationMs": 40
+    },
+    "knockback": 10,
+    "sfx": "sfx-rivet-smg",
+    "sprite": "rivet-smg"
+  },
+  {
+    "id": "breach-shotgun",
+    "name": "Breach Shotgun",
+    "type": "shotgun",
+    "rarity": "common",
+    "energyPerShot": 3,
+    "damage": 2,
+    "fireRate": 1.6,
+    "spreadDeg": 30,
+    "projectileSpeed": 260,
+    "pellets": 5,
+    "behaviour": "bullet",
+    "behaviourParams": {},
+    "shake": {
+      "intensity": 0.006,
+      "durationMs": 90
+    },
+    "knockback": 120,
+    "sfx": "sfx-breach-shotgun",
+    "sprite": "breach-shotgun"
+  },
+  {
+    "id": "line-rifle",
+    "name": "Line Rifle",
+    "type": "rifle",
+    "rarity": "common",
+    "energyPerShot": 2,
+    "damage": 6,
+    "fireRate": 2.5,
+    "spreadDeg": 1,
+    "projectileSpeed": 420,
+    "pellets": 1,
+    "behaviour": "pierce",
+    "behaviourParams": {
+      "count": 1
+    },
+    "shake": {
+      "intensity": 0.004,
+      "durationMs": 60
+    },
+    "knockback": 40,
+    "sfx": "sfx-line-rifle",
+    "sprite": "line-rifle"
+  },
+  {
+    "id": "arc-carbine",
+    "name": "Arc Carbine",
+    "type": "burst",
+    "rarity": "rare",
+    "energyPerShot": 2,
+    "damage": 3,
+    "fireRate": 2,
+    "spreadDeg": 2,
+    "projectileSpeed": 340,
+    "pellets": 1,
+    "behaviour": "burst",
+    "behaviourParams": {
+      "count": 3,
+      "intervalMs": 60
+    },
+    "shake": {
+      "intensity": 0.003,
+      "durationMs": 50
+    },
+    "knockback": 20,
+    "sfx": "sfx-arc-carbine",
+    "sprite": "arc-carbine"
+  },
+  {
+    "id": "scatter-coil",
+    "name": "Scatter Coil",
+    "type": "shotgun",
+    "rarity": "rare",
+    "energyPerShot": 4,
+    "damage": 2,
+    "fireRate": 1.4,
+    "spreadDeg": 34,
+    "projectileSpeed": 260,
+    "pellets": 6,
+    "behaviour": "bounce",
+    "behaviourParams": {
+      "bounces": 1
+    },
+    "shake": {
+      "intensity": 0.006,
+      "durationMs": 90
+    },
+    "knockback": 80,
+    "sfx": "sfx-scatter-coil",
+    "sprite": "scatter-coil"
+  },
+  {
+    "id": "pulse-lance",
+    "name": "Pulse Lance",
+    "type": "beam",
+    "rarity": "rare",
+    "energyPerShot": 0,
+    "energyPerSecond": 5,
+    "damage": 0,
+    "fireRate": 0,
+    "spreadDeg": 0,
+    "projectileSpeed": 0,
+    "pellets": 1,
+    "behaviour": "beam",
+    "behaviourParams": {
+      "baseDps": 8,
+      "maxDps": 20,
+      "rampSec": 1.5,
+      "range": 160
+    },
+    "shake": {
+      "intensity": 0.001,
+      "durationMs": 30
+    },
+    "knockback": 0,
+    "sfx": "sfx-pulse-lance",
+    "sprite": "pulse-lance"
+  },
+  {
+    "id": "grid-cutter",
+    "name": "Grid Cutter",
+    "type": "melee",
+    "rarity": "rare",
+    "energyPerShot": 0,
+    "damage": 5,
+    "fireRate": 2.2,
+    "spreadDeg": 0,
+    "projectileSpeed": 0,
+    "pellets": 1,
+    "behaviour": "melee-swing",
+    "behaviourParams": {
+      "arcDeg": 120,
+      "range": 26,
+      "deletesBullets": true
+    },
+    "shake": {
+      "intensity": 0.004,
+      "durationMs": 60
+    },
+    "knockback": 60,
+    "sfx": "sfx-grid-cutter",
+    "sprite": "grid-cutter"
+  },
+  {
+    "id": "fuse-launcher",
+    "name": "Fuse Launcher",
+    "type": "launcher",
+    "rarity": "rare",
+    "energyPerShot": 6,
+    "damage": 10,
+    "fireRate": 1,
+    "spreadDeg": 2,
+    "projectileSpeed": 200,
+    "pellets": 1,
+    "behaviour": "explosive",
+    "behaviourParams": {
+      "radius": 32,
+      "selfSafe": true
+    },
+    "shake": {
+      "intensity": 0.01,
+      "durationMs": 120
+    },
+    "knockback": 100,
+    "sfx": "sfx-fuse-launcher",
+    "sprite": "fuse-launcher"
+  },
+  {
+    "id": "static-repeater",
+    "name": "Static Repeater",
+    "type": "automatic",
+    "rarity": "epic",
+    "energyPerShot": 1,
+    "damage": 2,
+    "fireRate": 10,
+    "spreadDeg": 6,
+    "projectileSpeed": 320,
+    "pellets": 1,
+    "behaviour": "chain",
+    "behaviourParams": {
+      "jumps": 2,
+      "range": 48,
+      "dmgMul": 0.5
+    },
+    "shake": {
+      "intensity": 0.002,
+      "durationMs": 40
+    },
+    "knockback": 10,
+    "sfx": "sfx-static-repeater",
+    "sprite": "static-repeater"
+  },
+  {
+    "id": "null-cannon",
+    "name": "Null Cannon",
+    "type": "charge",
+    "rarity": "epic",
+    "energyPerShot": 10,
+    "damage": 30,
+    "fireRate": 0.8,
+    "spreadDeg": 0,
+    "projectileSpeed": 180,
+    "pellets": 1,
+    "behaviour": "charge-orb",
+    "behaviourParams": {
+      "chargeSec": 1,
+      "radius": 10,
+      "pierceAll": true
+    },
+    "shake": {
+      "intensity": 0.01,
+      "durationMs": 120
+    },
+    "knockback": 140,
+    "sfx": "sfx-null-cannon",
+    "sprite": "null-cannon"
+  }
+]

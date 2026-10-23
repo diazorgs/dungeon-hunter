@@ -1,0 +1,136 @@
+[
+  {
+    "id": "cooling-fins",
+    "name": "Cooling Fins",
+    "description": "+20% fire rate",
+    "inBasePool": true,
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "fireRateMul",
+        "value": 1.2
+      }
+    ]
+  },
+  {
+    "id": "spare-cell",
+    "name": "Spare Cell",
+    "description": "+1 max Shield",
+    "inBasePool": true,
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "maxShield",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "battery-pack",
+    "name": "Battery Pack",
+    "description": "+60 max Energy",
+    "inBasePool": true,
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "maxEnergy",
+        "value": 60
+      }
+    ]
+  },
+  {
+    "id": "overclock-core",
+    "name": "Overclock Core",
+    "description": "+25% damage, -1 max HP",
+    "inBasePool": true,
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "damageMul",
+        "value": 1.25
+      },
+      {
+        "kind": "stat",
+        "stat": "maxHp",
+        "value": -1
+      }
+    ]
+  },
+  {
+    "id": "ricochet-chip",
+    "name": "Ricochet Chip",
+    "description": "Bullets bounce off walls once",
+    "inBasePool": true,
+    "effects": [
+      {
+        "kind": "flag",
+        "flag": "bulletsBounce"
+      }
+    ]
+  },
+  {
+    "id": "scrap-magnet",
+    "name": "Scrap Magnet",
+    "description": "Pickup radius doubled",
+    "inBasePool": true,
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "pickupRadiusMul",
+        "value": 2
+      }
+    ]
+  },
+  {
+    "id": "dash-coil",
+    "name": "Dash Coil",
+    "description": "+1 dash charge",
+    "inBasePool": false,
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "dashCharges",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "field-patch",
+    "name": "Field Patch",
+    "description": "Heal 1 HP when a sector boss dies",
+    "inBasePool": true,
+    "effects": [
+      {
+        "kind": "hook",
+        "hook": "onBossKilled",
+        "action": "heal",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "thorn-plating",
+    "name": "Thorn Plating",
+    "description": "Enemies that touch you take damage",
+    "inBasePool": false,
+    "effects": [
+      {
+        "kind": "flag",
+        "flag": "thornContact"
+      }
+    ]
+  },
+  {
+    "id": "lucky-seal",
+    "name": "Lucky Seal",
+    "description": "Higher rarity chance on chests",
+    "inBasePool": false,
+    "effects": [
+      {
+        "kind": "stat",
+        "stat": "chestLuck",
+        "value": 1
+      }
+    ]
+  }
+]

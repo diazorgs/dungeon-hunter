@@ -1,0 +1,39 @@
+// DESIGN.md §11.2: the whole game palette. Mirrored as Tailwind tokens in apps/web/src/index.css.
+export const PALETTE = {
+  void: 0x0b0d12,
+  ink: 0x141821,
+  "steel-900": 0x1c2230,
+  "steel-800": 0x263042,
+  "steel-700": 0x34415a,
+  "steel-600": 0x47587a,
+  "steel-500": 0x5f7399,
+  "steel-400": 0x8296b8,
+  "steel-300": 0xa9b8d1,
+  "steel-200": 0xcfd8e6,
+  bone: 0xeef2f7,
+  "rust-700": 0x5a2e1c,
+  "rust-500": 0x9a4a26,
+  "amber-500": 0xe08a2e,
+  "amber-300": 0xf5b95a,
+  "amber-100": 0xfde3a7,
+  "teal-800": 0x0f3b40,
+  "teal-600": 0x1d6b6b,
+  "teal-400": 0x2fa3a0,
+  "teal-200": 0x7fe0d4,
+  "bleed-900": 0x3a0b2e,
+  "bleed-700": 0x7a1257,
+  "bleed-500": 0xd81b8c,
+  "bleed-300": 0xff4fbf,
+  "bleed-100": 0xffb3e6,
+  hp: 0xe0343b,
+  "hp-dark": 0x7a1520,
+  shield: 0x9fd8ff,
+  energy: 0x3d7bff,
+  scrap: 0xffd23f,
+  heal: 0x5fd16a,
+  white: 0xffffff,
+} as const;
+
+export type PaletteToken = keyof typeof PALETTE;
+
+export const toCss = (n: number): string => `#${n.toString(16).padStart(6, "0")}`;

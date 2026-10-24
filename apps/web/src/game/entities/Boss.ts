@@ -1,4 +1,6 @@
 import Phaser from "phaser";
+import { playAnim } from "../content/animations.ts";
+import { resolveTexture } from "../content/textures.ts";
 import { createEnemyHealth, damageEnemy } from "../logic/combat/enemyHealth.ts";
 import type { EnemyHealth } from "../logic/combat/enemyHealth.ts";
 import { phaseIndex } from "../logic/boss/phases.ts";
@@ -43,9 +45,10 @@ export abstract class Boss extends Phaser.Physics.Arcade.Sprite {
     y: number,
     def: BossDef,
     world: CombatWorld,
-    texture: string,
+    texture: { key: string; frame?: string },
   ) {
-    super(scene, x, y, texture);
+    const tex = resolveTexture(scene.textures, texture, "ph-boss");
+    super(scene, x, y, tex.key, tex.frame);
     this.def = def;
     this.world = world;
     this.health = createEnemyHealth(def.hp);
@@ -53,6 +56,7 @@ export abstract class Boss extends Phaser.Physics.Arcade.Sprite {
     this.scheduler = new AttackScheduler(createRng(def.id));
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    playAnim(this, `boss.${def.id}.idle`);
     // Bosses ignore knockback.
     this.body.pushable = false;
   }
@@ -83,7 +87,14 @@ export abstract class Boss extends Phaser.Physics.Arcade.Sprite {
       this.phase = p;
       this.scheduler.setPhase(this.phases()[p]!);
     }
-    this.runStep(this.scheduler.update(now), now, dt);
+    const s = this.scheduler.update(now);
+    this.runStep(s, now, dt);
+    if (!this.health.dead) playAnim(this, `boss.${this.def.id}.${this.animState(s)}`);
+  }
+
+  /** Animation for the current schedule stage; Gatekeeper overrides it for its stun. */
+  protected animState(s: ScheduleState): string {
+    return s.stage === "recover" ? "idle" : "attack";
   }
 
   get phaseIndex(): number {
@@ -99,6 +110,7 @@ export abstract class Boss extends Phaser.Physics.Arcade.Sprite {
     );
     this.scene.events.emit("boss:hit", { target: this, x: this.x, y: this.y, dmg: dealt });
     this.scene.events.emit("boss:hp", { hp: this.health.hp });
+    if (killed) playAnim(this, `boss.${this.def.id}.death`);
     return killed;
   }
 

@@ -4,7 +4,7 @@ import { buildRunConfig } from "../profile/runConfig.ts";
 import { useSessionStore } from "../stores/session.ts";
 import { useSettingsStore } from "../stores/settings.ts";
 
-/** Starts a run for the selected Runner from the current profile (`?seed=` in DEV). */
+/** Starts a run for the selected Runner from the current profile (`?seed=` / `?runner=` in DEV). */
 export function useStartRun(): () => void {
   const { data: profile } = useProfile();
   const startRun = useSessionStore((s) => s.startRun);
@@ -12,7 +12,10 @@ export function useStartRun(): () => void {
   const settings = useSettingsStore((s) => s.settings);
   return () => {
     if (!profile) return;
-    const seed = import.meta.env.DEV ? parseDevParams(location.search).seed : undefined;
-    startRun(buildRunConfig(profile, runnerId, settings, seed));
+    if (!import.meta.env.DEV) return startRun(buildRunConfig(profile, runnerId, settings));
+    // DEV: ?seed= and ?runner= (the latter ignores unlocks, for testing Kit).
+    const dev = parseDevParams(location.search);
+    const config = buildRunConfig(profile, runnerId, settings, dev.seed);
+    startRun(dev.runner ? { ...config, runnerId: dev.runner } : config);
   };
 }

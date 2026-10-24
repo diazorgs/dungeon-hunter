@@ -1,5 +1,6 @@
 import type { Runner } from "@dh/shared";
 import { Cooldown } from "../logic/combat/cooldown.ts";
+import { PatchDrone } from "./skills/PatchDrone.ts";
 import { Overcharge } from "./skills/Overcharge.ts";
 import type { Skill, SkillContext } from "./skills/Skill.ts";
 
@@ -9,7 +10,7 @@ export function createSkill(runner: Runner): Skill {
     case "overcharge":
       return new Overcharge(cooldownSec * 1000, durationSec * 1000);
     case "patch-drone":
-      throw new Error("patch-drone: not implemented until plan 23");
+      return new PatchDrone(cooldownSec * 1000, durationSec * 1000);
   }
 }
 

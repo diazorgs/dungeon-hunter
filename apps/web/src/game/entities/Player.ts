@@ -1,7 +1,8 @@
 import { PALETTE } from "@dh/shared";
 import type { Runner } from "@dh/shared";
 import Phaser from "phaser";
-import { textureFor } from "../content/textures.ts";
+import { playAnim } from "../content/animations.ts";
+import { resolveTexture, textureFor } from "../content/textures.ts";
 import type { ActiveBuffs } from "../logic/combat/buffs.ts";
 import { isActive } from "../logic/combat/buffs.ts";
 import {
@@ -23,6 +24,7 @@ const DASH_DISTANCE = 48;
 const DASH_MS = 120;
 const DASH_INVULN_MS = 200;
 const DASH_RECHARGE_MS = 600;
+const HURT_ANIM_MS = 150;
 
 /** The Runner: Arcade sprite wrapping pure combat state. Emits `player:dashed` on the scene. */
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -39,9 +41,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   facing: 1 | -1 = 1;
   private readonly dash: ChargePool;
   private dashEndsAt = 0;
+  private hurtUntil = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number, runner: Runner) {
-    const tex = textureFor("runner", runner.id);
+    const tex = resolveTexture(scene.textures, textureFor("runner", runner.id), "ph-runner");
     super(scene, x, y, tex.key, tex.frame);
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -63,7 +66,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const r = applyDamage(this.combat, amount, now);
     if (r.ignored) return r;
     this.scene.events.emit("player:damaged", { shieldLost: r.shieldLost, hpLost: r.hpLost });
-    if (r.died) this.scene.events.emit("player:died");
+    this.hurtUntil = now + HURT_ANIM_MS;
+    if (r.died) {
+      playAnim(this, `runner.${this.runner.id}.death`);
+      this.scene.events.emit("player:died");
+    }
     return r;
   }
 
@@ -89,6 +96,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setFlipX(this.facing < 0);
     this.setDepth(this.y + 1000);
     this.updateTint(now);
+    this.updateAnim(now);
+  }
+
+  private updateAnim(now: number): void {
+    if (this.combat.hp <= 0) return; // death plays once, from hurt()
+    const state = this.isDashing
+      ? "dash"
+      : now < this.hurtUntil
+        ? "hurt"
+        : this.body.velocity.lengthSq() > 100
+          ? "run"
+          : "idle";
+    playAnim(this, `runner.${this.runner.id}.${state}`);
   }
 
   private steer(tx: number, ty: number, dt: number): void {

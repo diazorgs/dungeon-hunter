@@ -13,14 +13,33 @@ const KNOWN: Record<Kind, readonly string[]> = {
 
 const warned = new Set<string>();
 
-/** Data id → texture key. Every known id maps to its kind's placeholder until real art lands. */
+// Kinds with generated atlas art (scripts/gen-art.ts); the rest still use placeholders.
+const ATLAS: Partial<Record<Kind, string>> = { runner: "runners", boss: "bosses" };
+
+/** Data id → texture key (+ atlas frame). Unknown ids get the magenta "missing" texture. */
 export function textureFor(kind: Kind, id: string): { key: string; frame?: string } {
+  const atlas = ATLAS[kind];
+  if (atlas && KNOWN[kind].includes(id)) return { key: atlas, frame: `${id}/idle/0` };
   if (KNOWN[kind].includes(id)) return { key: `ph-${kind}` };
   if (!warned.has(`${kind}:${id}`)) {
     warned.add(`${kind}:${id}`);
     console.warn(`textureFor: no texture for ${kind} "${id}"`);
   }
   return { key: "missing" };
+}
+
+/** An atlas that failed to load (or lacks the frame) falls back to the kind's placeholder, once warned. */
+export function resolveTexture(
+  textures: Phaser.Textures.TextureManager,
+  tex: { key: string; frame?: string },
+  fallback: string,
+): { key: string; frame?: string } {
+  if (textures.exists(tex.key) && (!tex.frame || textures.get(tex.key).has(tex.frame))) return tex;
+  if (!warned.has(`tex:${tex.key}/${tex.frame}`)) {
+    warned.add(`tex:${tex.key}/${tex.frame}`);
+    console.warn(`resolveTexture: ${tex.key}/${tex.frame} missing, using ${fallback}`);
+  }
+  return { key: fallback };
 }
 
 type Draw = (
@@ -201,6 +220,17 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
       f(PALETTE["teal-200"], 3, 3, 10, 2),
       f(PALETTE["teal-400"], 3, 7, 6, 1),
       f(PALETTE.scrap, 6, 14, 4, 3)
+    ),
+  ],
+  "ph-drone": [
+    10,
+    8,
+    (_, f) => (
+      f(PALETTE["steel-500"], 1, 2, 8, 5),
+      f(PALETTE["teal-400"], 0, 3, 1, 2),
+      f(PALETTE["teal-400"], 9, 3, 1, 2),
+      f(PALETTE["amber-300"], 4, 3, 2, 2),
+      f(PALETTE["steel-300"], 3, 0, 4, 2)
     ),
   ],
   "ph-log-terminal": [

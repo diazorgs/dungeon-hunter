@@ -1,5 +1,7 @@
 import { PALETTE } from "@dh/shared";
 import Phaser from "phaser";
+import { registerAnimations } from "../content/animations.ts";
+import { queueAtlases } from "../content/manifest.ts";
 import { queueRoomAssets } from "../content/rooms.ts";
 import { parseDevParams } from "../logic/devParams.ts";
 import { SFX_NAMES } from "../systems/AudioSystem.ts";
@@ -19,10 +21,13 @@ export class PreloadScene extends Phaser.Scene {
     const fill = this.add.rectangle(x, y, 0, 4, PALETTE["amber-500"]).setOrigin(0);
     this.load.on(Phaser.Loader.Events.PROGRESS, (p: number) => (fill.width = w * p));
     queueRoomAssets(this.load);
+    queueAtlases(this.load);
+    this.load.font("Silkscreen", "assets/fonts/ui.woff2", "woff2");
     for (const name of SFX_NAMES) this.load.audio(`sfx.${name}`, `assets/audio/sfx/${name}.wav`);
   }
 
   create() {
+    registerAnimations(this);
     if (import.meta.env.DEV && parseDevParams(location.search).scene === "sandbox") {
       this.scene.start(SceneKey.Sandbox);
       return;

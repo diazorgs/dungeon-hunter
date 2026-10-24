@@ -17,6 +17,8 @@ import type { Wave } from "../../logic/encounter/budget.ts";
 import type { Bullet } from "../Bullet.ts";
 import { IMPLEMENTED_AI } from "../../systems/ai/registry.ts";
 import type { CombatWorld } from "../../systems/CombatWorld.ts";
+import { playAnim } from "../../content/animations.ts";
+import { textureFor } from "../../content/textures.ts";
 import { Boss } from "../Boss.ts";
 import type { BossDef } from "../Boss.ts";
 import { ShieldArm } from "./ShieldArm.ts";
@@ -62,8 +64,8 @@ export class CoreWarden extends Boss {
   private started = false;
 
   constructor(scene: Phaser.Scene, x: number, y: number, def: BossDef, world: CombatWorld) {
-    super(scene, x, y, def, world, "ph-boss");
-    this.setScale(0.75).setTint(PALETTE["bleed-300"]);
+    super(scene, x, y, def, world, textureFor("boss", "core-warden"));
+    this.setScale(0.75);
     this.body.setSize(40, 40).setOffset(12, 12);
     this.body.immovable = true;
     this.arms = [new ShieldArm(scene, x, y), new ShieldArm(scene, x, y)];
@@ -101,6 +103,7 @@ export class CoreWarden extends Boss {
     const { dealt, killed } = damageEnemy(this.health, this.health.hp - target);
     this.scene.events.emit("boss:hit", { target: this, x: this.x, y: this.y, dmg: dealt });
     this.scene.events.emit("boss:hp", { hp: this.health.hp });
+    if (killed) playAnim(this, "boss.core-warden.death");
     return killed;
   }
 
@@ -113,6 +116,7 @@ export class CoreWarden extends Boss {
       this.scheduler.setPhase(SHIELDED);
     }
     const hpPct = this.health.hp / this.health.maxHp;
+    playAnim(this, `boss.core-warden.${this.wardenPhase === "shielded" ? "idle" : "attack"}`);
     switch (this.wardenPhase) {
       case "shielded":
         this.runStep(this.scheduler.update(now), now);
@@ -190,7 +194,7 @@ export class CoreWarden extends Boss {
     }
     if (s.stage === "recover") {
       this.sweeping = false;
-      if (s.changed) this.setTint(PALETTE["bleed-300"]);
+      if (s.changed && this.wardenPhase !== "enraged") this.clearTint();
       return;
     }
     if (s.changed) this.shots = 0;

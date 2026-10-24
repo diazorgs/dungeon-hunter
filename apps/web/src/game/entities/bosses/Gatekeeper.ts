@@ -2,6 +2,7 @@ import type Phaser from "phaser";
 import type { AttackStep, ScheduleState } from "../../logic/boss/schedule.ts";
 import { ring } from "../../logic/boss/patterns.ts";
 import type { CombatWorld } from "../../systems/CombatWorld.ts";
+import { textureFor } from "../../content/textures.ts";
 import { Boss } from "../Boss.ts";
 import type { BossDef } from "../Boss.ts";
 
@@ -18,10 +19,14 @@ export class Gatekeeper extends Boss {
   private stunned = false;
 
   constructor(scene: Phaser.Scene, x: number, y: number, def: BossDef, world: CombatWorld) {
-    super(scene, x, y, def, world, "ph-boss");
+    super(scene, x, y, def, world, textureFor("boss", "gatekeeper"));
     this.setScale(0.75);
     this.body.setSize(48, 48).setOffset(8, 8);
     this.damageTakenMul = def.params.armourMul ?? 0.5;
+  }
+
+  protected override animState(s: ScheduleState): string {
+    return this.stunned && s.stage === "recover" ? "stunned" : super.animState(s);
   }
 
   phases(): AttackStep[][] {

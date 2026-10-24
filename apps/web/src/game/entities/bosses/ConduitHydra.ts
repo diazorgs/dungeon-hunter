@@ -7,6 +7,7 @@ import type { HeadId } from "../../logic/boss/hydra.ts";
 import { ring, spiralStep, spread } from "../../logic/boss/patterns.ts";
 import type { AttackStep, ScheduleState } from "../../logic/boss/schedule.ts";
 import type { CombatWorld } from "../../systems/CombatWorld.ts";
+import { textureFor } from "../../content/textures.ts";
 import { Boss } from "../Boss.ts";
 import type { BossDef } from "../Boss.ts";
 import { HydraHead } from "./HydraHead.ts";
@@ -31,7 +32,7 @@ export class ConduitHydra extends Boss {
   private sweepFrom = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number, def: BossDef, world: CombatWorld) {
-    super(scene, x, y, def, world, "ph-hydra-core");
+    super(scene, x, y, def, world, textureFor("boss", "conduit-hydra"));
     this.cables = scene.add.graphics().setDepth(this.depth - 1);
     this.beam = scene.add.graphics().setDepth(5400);
     this.heads = HEAD_IDS.map((id) => new HydraHead(scene, x, y, id, def.params.headHp ?? 150));

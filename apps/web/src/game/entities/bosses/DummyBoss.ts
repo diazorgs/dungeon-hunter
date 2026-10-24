@@ -13,7 +13,7 @@ export class DummyBoss extends Boss {
       y,
       { id: "dummy", name: "Test Dummy", hp: 120, thresholds: [], params: {} },
       world,
-      "ph-boss",
+      { key: "ph-boss" },
     );
     this.setScale(0.5);
   }

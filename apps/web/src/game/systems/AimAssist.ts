@@ -19,11 +19,16 @@ export class AimAssist {
   }
 
   update(player: Player, cursor: Vec2, mode: "soft" | "full"): number {
-    const visible = this.targets().map((t) => ({
-      ...t,
-      visible: t.visible && this.canSee(player, t),
-    }));
-    return assistAngle(player, cursor, visible, mode, player.aimAngle);
+    return assistAngle(player, cursor, this.visibleFrom(player), mode, player.aimAngle);
+  }
+
+  /** Live targets with `visible` meaning "in line of sight from `from`". */
+  visibleFrom(from: Vec2): AimTarget[] {
+    return this.targets().map((t) => ({ ...t, visible: t.visible && this.canSee(from, t) }));
+  }
+
+  isBlocked(x: number, y: number): boolean {
+    return this.blocked(x, y);
   }
 
   private canSee(from: Vec2, to: Vec2): boolean {

@@ -10,7 +10,8 @@ export class HydraHead extends Phaser.Physics.Arcade.Sprite {
   readonly health: EnemyHealth;
 
   constructor(scene: Phaser.Scene, x: number, y: number, headId: HeadId, hp: number) {
-    super(scene, x, y, "ph-hydra-head");
+    super(scene, x, y, "bosses", "hydra-head/idle/0");
+    if (!scene.textures.exists("bosses")) this.setTexture("ph-hydra-head");
     this.headId = headId;
     this.health = createEnemyHealth(hp);
     scene.add.existing(this);

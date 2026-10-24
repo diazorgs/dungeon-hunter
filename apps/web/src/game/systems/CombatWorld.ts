@@ -85,7 +85,7 @@ export class CombatWorld {
     this.crosshair.update(input.aimWorld, input.device, input.aimWorld);
     this.juice.tickHitStop(performance.now());
     if (this.juice.hitStopped) return;
-    const ctx = { scene: this.scene, player: this.player };
+    const ctx = { scene: this.scene, player: this.player, world: this };
     this.player.aimAngle = this.aim.update(this.player, input.aimWorld, aimMode);
     this.player.tick(input, now, dt);
     if (input.skill) this.skills.tryActivate(ctx, now);

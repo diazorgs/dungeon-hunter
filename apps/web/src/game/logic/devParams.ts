@@ -1,3 +1,5 @@
+import { RUNNER_IDS } from "@dh/shared";
+import type { RunnerId } from "@dh/shared";
 import { isValidSeed } from "@dh/utils";
 
 export interface DevParams {
@@ -7,6 +9,7 @@ export interface DevParams {
   room?: string;
   god?: boolean;
   spawn?: string[];
+  runner?: RunnerId;
 }
 
 /** Parses `?scene=sandbox&seed=…` dev overrides; invalid values are dropped. */
@@ -24,5 +27,7 @@ export function parseDevParams(search: string): DevParams {
   if (god === "1" || god === "true") out.god = true;
   const spawn = q.get("spawn")?.split(",").filter(Boolean);
   if (spawn?.length) out.spawn = spawn;
+  const runner = RUNNER_IDS.find((id) => id === q.get("runner"));
+  if (runner) out.runner = runner;
   return out;
 }

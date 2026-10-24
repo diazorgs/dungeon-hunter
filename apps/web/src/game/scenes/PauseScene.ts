@@ -1,3 +1,4 @@
+import { UI_FONT } from "../hud/text.ts";
 import { PALETTE } from "@dh/shared";
 import Phaser from "phaser";
 import { SceneKey } from "./keys.ts";
@@ -17,7 +18,7 @@ export class PauseScene extends Phaser.Scene {
     this.add.rectangle(0, 0, width, height, PALETTE.void, 0.7).setOrigin(0);
     const text = this.add
       .text(width / 2, height / 2, MENU, {
-        fontFamily: "monospace",
+        fontFamily: UI_FONT,
         fontSize: "8px",
         color: "#cfd8e6",
         align: "left",

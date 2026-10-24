@@ -1,3 +1,4 @@
+import { UI_FONT } from "../hud/text.ts";
 import Phaser from "phaser";
 
 const POOL = 64;
@@ -15,7 +16,7 @@ export class DamageNumbers {
     for (let i = 0; i < POOL; i++)
       this.pool.push(
         scene.add
-          .text(0, 0, "", { fontFamily: "monospace", fontSize: "8px", color: "#eef2f7" })
+          .text(0, 0, "", { fontFamily: UI_FONT, fontSize: "8px", color: "#eef2f7" })
           .setOrigin(0.5)
           .setResolution(4)
           .setDepth(6500)

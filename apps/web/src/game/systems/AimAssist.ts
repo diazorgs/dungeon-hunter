@@ -4,7 +4,7 @@ import type { AimTarget } from "../logic/combat/aim.ts";
 import type { Vec2 } from "../logic/input.ts";
 import { lineClear } from "../logic/los.ts";
 
-/** Gathers aim targets, applies line of sight against walls, and asks the pure logic for the angle. */
+/** Gathers aim targets, applies line of sight against walls, and asks the pure logic for the auto-aim angle. */
 export class AimAssist {
   private targets: () => readonly AimTarget[] = () => [];
   private blocked: (x: number, y: number) => boolean = () => false;
@@ -18,8 +18,8 @@ export class AimAssist {
     this.blocked = fn;
   }
 
-  update(player: Player, cursor: Vec2, mode: "soft" | "full"): number {
-    return assistAngle(player, cursor, this.visibleFrom(player), mode, player.aimAngle);
+  update(player: Player, facing: Vec2): number {
+    return assistAngle(player, facing, this.visibleFrom(player), player.aimAngle);
   }
 
   /** Live targets with `visible` meaning "in line of sight from `from`". */

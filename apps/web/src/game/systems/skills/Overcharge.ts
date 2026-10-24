@@ -14,6 +14,6 @@ export class Overcharge implements Skill {
 
   activate({ scene, player }: SkillContext, now: number): void {
     addBuff(player.buffs, "overcharge", now, this.durationMs);
-    scene.events.emit("skill:activated", this.id);
+    scene.events.emit("skill:activated", { id: this.id, x: player.x, y: player.y });
   }
 }

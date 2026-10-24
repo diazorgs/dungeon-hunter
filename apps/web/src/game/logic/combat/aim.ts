@@ -1,9 +1,7 @@
-import { angleBetween, angleDiff, degToRad, distSq } from "@dh/utils";
+import { angleBetween, distSq } from "@dh/utils";
 import type { Vec2 } from "../input.ts";
 
-export const SOFT_ASSIST_MAX_DEG = 8;
-export const SOFT_CAPTURE_RADIUS = 24;
-export const FULL_AUTO_RANGE = 160;
+export const AUTO_AIM_RANGE = 160;
 
 export interface AimTarget {
   id: number;
@@ -13,33 +11,32 @@ export interface AimTarget {
   visible: boolean;
 }
 
-/** Final aim angle (radians) for the given mode (DESIGN.md §7.2). */
+/**
+ * Auto-aim (DESIGN.md §7.2): the nearest visible enemy within 160 px, else toward `facing`
+ * (the point ahead of the Runner). Radians.
+ */
 export function assistAngle(
   origin: Vec2,
-  cursor: Vec2,
+  facing: Vec2,
   targets: readonly AimTarget[],
-  mode: "soft" | "full",
   prevAngle: number,
+  range = AUTO_AIM_RANGE,
 ): number {
-  // A cursor sitting on the Runner has no direction; keep the last one.
-  const cursorAngle =
-    cursor.x === origin.x && cursor.y === origin.y
-      ? prevAngle
-      : angleBetween(origin.x, origin.y, cursor.x, cursor.y);
-
-  if (mode === "full") {
-    const t = nearest(targets, origin, FULL_AUTO_RANGE);
-    return t ? angleBetween(origin.x, origin.y, t.x, t.y) : cursorAngle;
-  }
-
-  const t = nearest(targets, cursor, SOFT_CAPTURE_RADIUS);
-  if (!t || (t.x === origin.x && t.y === origin.y)) return cursorAngle;
-  const max = degToRad(SOFT_ASSIST_MAX_DEG);
-  const bend = angleDiff(cursorAngle, angleBetween(origin.x, origin.y, t.x, t.y));
-  return cursorAngle + Math.max(-max, Math.min(max, bend));
+  const t = nearest(targets, origin, range);
+  if (t && (t.x !== origin.x || t.y !== origin.y))
+    return angleBetween(origin.x, origin.y, t.x, t.y);
+  // A facing point on the Runner has no direction; keep the last one.
+  return facing.x === origin.x && facing.y === origin.y
+    ? prevAngle
+    : angleBetween(origin.x, origin.y, facing.x, facing.y);
 }
 
-function nearest(targets: readonly AimTarget[], from: Vec2, range: number): AimTarget | undefined {
+/** Nearest visible target within `range` of `from`, if any. */
+export function nearest(
+  targets: readonly AimTarget[],
+  from: Vec2,
+  range: number,
+): AimTarget | undefined {
   let best: AimTarget | undefined;
   let bestD = range * range;
   for (const t of targets) {

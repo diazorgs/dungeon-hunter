@@ -278,7 +278,7 @@ export class DungeonScene extends Phaser.Scene {
       input.interact = false;
       this.startLift();
     }
-    this.world.update(input, time, dt, this.runConfig.settings.aimMode);
+    this.world.update(input, time, dt);
     this.loot.update();
     this.encounters.update(this.world.player);
     this.camDirector.update(this.world.player, dt);

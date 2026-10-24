@@ -65,7 +65,7 @@ vp run @dh/web#dev
 
 Open <http://localhost:5173>. The title screen says "Playing as guest": progress is saved in this browser's localStorage. Everything works except logging in and the leaderboard.
 
-Controls: WASD move, mouse aim, left click fire, right click or Space skill, Shift dash, Q or wheel swap weapon, E interact, Tab map, Esc pause. A gamepad works too.
+Controls (keyboard only, auto-aim): WASD or arrows move, J attack (hold), K skill, Space or Shift dash, Q swap weapon, E interact, Tab map, Esc pause. A gamepad works too.
 
 ## 5. Set up the backend (accounts, leaderboard)
 

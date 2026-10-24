@@ -8,8 +8,6 @@ import { installCrashHandler } from "./errorHandler.ts";
 const largestIntegerScale = () =>
   Math.max(1, Math.min(Math.floor(innerWidth / GAME_WIDTH), Math.floor(innerHeight / GAME_HEIGHT)));
 
-const CAPTURED_KEYS = new Set([" ", "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]);
-
 /** Owns one Phaser.Game for the lifetime of a run. React and Phaser talk only via `bus`. */
 export function PhaserGame({
   config,
@@ -54,7 +52,6 @@ export function PhaserGame({
         aria-label="Game"
         className="cursor-none outline-none"
         style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }}
-        onKeyDown={(e) => CAPTURED_KEYS.has(e.key) && e.preventDefault()}
       />
     </div>
   );

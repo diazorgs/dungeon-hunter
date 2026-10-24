@@ -86,7 +86,8 @@ export class GuardianSystem {
         g.destroy();
         continue;
       }
-      g.setDepth(g.y + 1000);
+      // Sprites are drawn facing right; turn toward the Runner.
+      g.setDepth(g.y + 1000).setFlipX(this.player.x < g.x);
       // A dead Runner is not a target: everyone idles.
       if (this.player.combat.dead || g.busy(now)) {
         if (this.player.combat.dead) g.setVelocity(0, 0);

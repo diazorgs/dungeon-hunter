@@ -6,6 +6,7 @@ export interface Vec2 {
 /** Device-independent input, read once per frame (DESIGN.md §4.6). */
 export interface InputState {
   move: Vec2;
+  /** Where the Runner aims when auto-aim finds no target: ahead along the last move. */
   aimWorld: Vec2;
   fire: boolean;
   skill: boolean;

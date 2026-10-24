@@ -13,8 +13,13 @@ const KNOWN: Record<Kind, readonly string[]> = {
 
 const warned = new Set<string>();
 
-// Kinds with generated atlas art (scripts/gen-art.ts); the rest still use placeholders.
-const ATLAS: Partial<Record<Kind, string>> = { runner: "runners", boss: "bosses" };
+// Kinds with generated atlas art (scripts/gen-art.ts); pickups still use placeholders.
+const ATLAS: Partial<Record<Kind, string>> = {
+  runner: "runners",
+  boss: "bosses",
+  guardian: "guardians",
+  weapon: "weapons",
+};
 
 /** Data id → texture key (+ atlas frame). Unknown ids get the magenta "missing" texture. */
 export function textureFor(kind: Kind, id: string): { key: string; frame?: string } {
@@ -91,34 +96,42 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
   ],
   "ph-weapon": [12, 4, (_, f) => f(PALETTE["steel-300"], 0, 0, 12, 4)],
   "ph-pickup": [6, 6, (_, f) => f(PALETTE.energy, 0, 0, 6, 6)],
-  "ph-crosshair": [
-    9,
-    9,
-    (_, f) => (
-      f(PALETTE.bone, 4, 0, 1, 3),
-      f(PALETTE.bone, 4, 6, 1, 3),
-      f(PALETTE.bone, 0, 4, 3, 1),
-      f(PALETTE.bone, 6, 4, 3, 1),
-      f(PALETTE["amber-300"], 4, 4, 1, 1)
-    ),
-  ],
+  // Locked N/S door: a gate front seen in 3/4 (its cap is "ph-door-cap-h", one tile up).
   "ph-door-h": [
     48,
     16,
-    (_, f) => (
-      f(PALETTE["steel-600"], 0, 0, 48, 16),
-      f(PALETTE["amber-500"], 0, 6, 48, 4),
-      f(PALETTE["rust-700"], 0, 14, 48, 2)
-    ),
+    (_, f) => {
+      f(PALETTE["steel-700"], 0, 0, 48, 16);
+      f(PALETTE.ink, 0, 0, 48, 1);
+      for (let x = 3; x < 46; x += 5) f(PALETTE["steel-400"], x, 2, 2, 12);
+      f(PALETTE["amber-500"], 0, 6, 48, 2);
+      f(PALETTE["amber-300"], 22, 6, 4, 2);
+      f(PALETTE["steel-800"], 0, 14, 48, 2);
+    },
   ],
+  "ph-door-cap-h": [
+    48,
+    16,
+    (_, f) => {
+      // 10 px slab like the wall caps beside it (top 6 px left open).
+      f(PALETTE["steel-800"], 0, 6, 48, 10);
+      f(PALETTE.ink, 0, 6, 48, 1);
+      for (let x = 0; x < 48; x += 8) f(PALETTE["amber-500"], x, 8, 4, 5);
+      f(PALETTE["steel-600"], 0, 14, 48, 1);
+      f(PALETTE["steel-500"], 0, 15, 48, 1);
+    },
+  ],
+  // Locked W/E door seen from above, like a side wall's cap.
   "ph-door-v": [
     16,
     48,
-    (_, f) => (
-      f(PALETTE["steel-600"], 0, 0, 16, 48),
-      f(PALETTE["amber-500"], 6, 0, 4, 48),
-      f(PALETTE["rust-700"], 14, 0, 2, 48)
-    ),
+    (_, f) => {
+      f(PALETTE["steel-800"], 0, 0, 16, 48);
+      f(PALETTE.ink, 0, 0, 1, 48);
+      f(PALETTE.ink, 15, 0, 1, 48);
+      for (let y = 0; y < 48; y += 8) f(PALETTE["amber-500"], 4, y, 8, 4);
+      f(PALETTE["steel-500"], 0, 46, 16, 2);
+    },
   ],
   "ph-marker": [
     12,
@@ -153,44 +166,63 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
     14,
     14,
     (_, f) => (
-      f(PALETTE["rust-700"], 0, 0, 14, 14),
-      f(PALETTE["rust-500"], 1, 1, 12, 12),
-      f(PALETTE["rust-700"], 1, 6, 12, 2),
-      f(PALETTE["amber-500"], 6, 1, 2, 12)
+      f(PALETTE.ink, 0, 0, 14, 14),
+      f(PALETTE["amber-500"], 1, 1, 12, 1),
+      f(PALETTE["rust-500"], 1, 2, 12, 3),
+      f(PALETTE["rust-700"], 1, 5, 12, 8),
+      f(PALETTE["rust-500"], 2, 7, 10, 1),
+      f(PALETTE["rust-500"], 2, 10, 10, 1),
+      f(PALETTE["amber-500"], 6, 5, 2, 8)
     ),
   ],
   "ph-chest": [
     16,
     12,
     (_, f) => (
-      f(PALETTE["steel-700"], 0, 0, 16, 12),
-      f(PALETTE["steel-500"], 1, 1, 14, 4),
-      f(PALETTE["amber-500"], 7, 5, 2, 3)
+      f(PALETTE.ink, 0, 0, 16, 12),
+      f(PALETTE["steel-300"], 1, 1, 14, 1),
+      f(PALETTE["steel-500"], 1, 2, 14, 3),
+      f(PALETTE["steel-700"], 1, 5, 14, 6),
+      f(PALETTE["steel-600"], 1, 5, 14, 1),
+      f(PALETTE["amber-500"], 7, 4, 2, 4),
+      f(PALETTE["amber-300"], 7, 4, 2, 1)
     ),
   ],
   "ph-chest-gold": [
     16,
     12,
     (_, f) => (
-      f(PALETTE.scrap, 0, 0, 16, 12),
-      f(PALETTE["steel-700"], 1, 1, 14, 10),
-      f(PALETTE.scrap, 1, 4, 14, 1),
-      f(PALETTE.bone, 7, 5, 2, 3)
+      f(PALETTE.ink, 0, 0, 16, 12),
+      f(PALETTE["amber-100"], 1, 1, 14, 1),
+      f(PALETTE.scrap, 1, 2, 14, 3),
+      f(PALETTE["rust-700"], 1, 5, 14, 6),
+      f(PALETTE.scrap, 1, 5, 14, 1),
+      f(PALETTE.scrap, 1, 5, 2, 6),
+      f(PALETTE.scrap, 13, 5, 2, 6),
+      f(PALETTE.bone, 7, 4, 2, 4)
     ),
   ],
   "ph-chest-open": [
     16,
     12,
-    (_, f) => (f(PALETTE["steel-700"], 0, 4, 16, 8), f(PALETTE.ink, 1, 5, 14, 3)),
+    (_, f) => (
+      f(PALETTE.ink, 0, 0, 16, 12),
+      f(PALETTE["steel-500"], 1, 1, 14, 2),
+      f(PALETTE.void, 2, 3, 12, 3),
+      f(PALETTE["steel-700"], 1, 6, 14, 5),
+      f(PALETTE["steel-600"], 1, 6, 14, 1)
+    ),
   ],
   "ph-lift": [
     32,
     16,
     (_, f) => (
-      f(PALETTE["steel-600"], 0, 0, 32, 16),
-      f(PALETTE["amber-500"], 2, 2, 28, 12),
-      f(PALETTE.ink, 4, 4, 24, 8),
-      f(PALETTE["amber-300"], 14, 6, 4, 4)
+      f(PALETTE.ink, 0, 0, 32, 16),
+      f(PALETTE["steel-500"], 1, 1, 30, 11),
+      f(PALETTE["amber-500"], 3, 2, 26, 9),
+      f(PALETTE["steel-800"], 5, 3, 22, 7),
+      f(PALETTE["amber-300"], 14, 5, 4, 3),
+      f(PALETTE["steel-700"], 1, 12, 30, 3)
     ),
   ],
   "ph-hydra-core": [
@@ -215,11 +247,14 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
     16,
     20,
     (_, f) => (
-      f(PALETTE["steel-700"], 0, 0, 16, 20),
-      f(PALETTE.ink, 2, 2, 12, 9),
-      f(PALETTE["teal-200"], 3, 3, 10, 2),
-      f(PALETTE["teal-400"], 3, 7, 6, 1),
-      f(PALETTE.scrap, 6, 14, 4, 3)
+      f(PALETTE.ink, 0, 0, 16, 20),
+      f(PALETTE["steel-500"], 1, 1, 14, 3),
+      f(PALETTE["steel-700"], 1, 4, 14, 15),
+      f(PALETTE.void, 2, 5, 12, 7),
+      f(PALETTE["teal-200"], 3, 6, 10, 2),
+      f(PALETTE["teal-400"], 3, 9, 6, 1),
+      f(PALETTE["steel-600"], 1, 13, 14, 1),
+      f(PALETTE.scrap, 6, 15, 4, 2)
     ),
   ],
   "ph-drone": [
@@ -237,12 +272,14 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
     12,
     16,
     (_, f) => (
-      f(PALETTE["steel-700"], 0, 0, 12, 16),
-      f(PALETTE.ink, 1, 1, 10, 8),
-      f(PALETTE["teal-200"], 2, 2, 8, 1),
-      f(PALETTE["teal-200"], 2, 4, 5, 1),
-      f(PALETTE["teal-400"], 2, 6, 7, 1),
-      f(PALETTE["steel-500"], 3, 11, 6, 3)
+      f(PALETTE.ink, 0, 0, 12, 16),
+      f(PALETTE["steel-500"], 1, 1, 10, 2),
+      f(PALETTE["steel-700"], 1, 3, 10, 12),
+      f(PALETTE.void, 2, 4, 8, 6),
+      f(PALETTE["teal-200"], 3, 5, 6, 1),
+      f(PALETTE["teal-200"], 3, 7, 4, 1),
+      f(PALETTE["teal-400"], 3, 9, 5, 1),
+      f(PALETTE["steel-500"], 3, 12, 6, 2)
     ),
   ],
   "ph-arm": [

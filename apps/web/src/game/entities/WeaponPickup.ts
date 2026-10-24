@@ -1,7 +1,7 @@
 import { PALETTE, WEAPONS } from "@dh/shared";
 import type { Weapon, WeaponId } from "@dh/shared";
 import Phaser from "phaser";
-import { textureFor } from "../content/textures.ts";
+import { resolveTexture, textureFor } from "../content/textures.ts";
 
 // DESIGN.md §11.2 rarity colours.
 const RARITY_COLOR: Record<Weapon["rarity"], number> = {
@@ -16,11 +16,19 @@ export class WeaponPickup extends Phaser.GameObjects.Image {
   readonly weaponId: WeaponId;
 
   constructor(scene: Phaser.Scene, x: number, y: number, weaponId: WeaponId) {
-    const tex = textureFor("weapon", weaponId);
+    const tex = resolveTexture(scene.textures, textureFor("weapon", weaponId), "ph-weapon");
     super(scene, x, y, tex.key, tex.frame);
     this.weaponId = weaponId;
-    // shortcut: rarity shown as a tint until plan 23 adds outlined weapon sprites.
-    this.setTint(RARITY_COLOR[WEAPONS[weaponId].rarity]).setDepth(y + 999);
+    // Rarity reads as a coloured glow around the drawn sprite.
+    this.enableFilters().filters?.internal.addGlow(
+      RARITY_COLOR[WEAPONS[weaponId].rarity],
+      2,
+      0,
+      1,
+      false,
+      4,
+    );
+    this.setDepth(y + 999);
     scene.add.existing(this);
   }
 }

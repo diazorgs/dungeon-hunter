@@ -41,6 +41,12 @@
   --color-scrap: #ffd23f;
   --color-heal: #5fd16a;
   --color-white: #ffffff;
+  --color-moss-900: #14261c;
+  --color-moss-700: #23452a;
+  --color-moss-500: #3f7a34;
+  --color-moss-300: #8bb83f;
+  --color-skin: #f2c49b;
+  --color-skin-dark: #b8754e;
 }
 
 html,
@@ -61,4 +67,32 @@ body {
 img,
 canvas {
   image-rendering: pixelated;
+}
+
+/* Story cards: fade in, then a slow camera drift across the scene. */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes card-pan {
+  from {
+    transform: scale(1.12) translate(-3%, 1%);
+  }
+  to {
+    transform: scale(1.12) translate(3%, -1%);
+  }
+}
+.card-in {
+  animation: card-in 400ms ease-out;
+}
+.card-pan {
+  animation: card-pan 9s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-in,
+  .card-pan {
+    animation: none;
+  }
 }

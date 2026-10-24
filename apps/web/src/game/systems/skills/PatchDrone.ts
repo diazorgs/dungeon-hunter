@@ -42,7 +42,7 @@ export class PatchDrone implements Skill {
     const [dx, dy] = free ?? [0, 0];
     this.drone = new Drone(scene, player.x + dx, player.y + dy, this.opts);
     this.drone.nextShotAt = now;
-    scene.events.emit("skill:activated", this.id);
+    scene.events.emit("skill:activated", { id: this.id, x: player.x, y: player.y });
   }
 
   update({ world }: SkillContext, now: number): void {
@@ -58,7 +58,7 @@ export class PatchDrone implements Skill {
     const r2 = d.opts.range * d.opts.range;
     const targets = world.aim.visibleFrom(d).filter((t) => distSq(d.x, d.y, t.x, t.y) <= r2);
     if (!targets.some((t) => t.visible)) return;
-    d.aim = assistAngle(d, d, targets, "full", d.aim);
+    d.aim = assistAngle(d, d, targets, d.aim);
     d.nextShotAt = now + 1000 / d.opts.fireRate;
     world.playerBullets.spawn(d.x, d.y, d.aim, d.opts.bulletSpeed, {
       damage: d.opts.damage,

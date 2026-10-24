@@ -137,7 +137,7 @@ export class SandboxScene extends Phaser.Scene {
 
   update(time: number, delta: number) {
     const input = this.input$.read(this.cameras.main, this.world.player);
-    this.world.update(input, time, delta / 1000, this.runConfig.settings.aimMode);
+    this.world.update(input, time, delta / 1000);
     if (input.pause) {
       this.scene.launch(SceneKey.Pause, { from: SceneKey.Sandbox });
       this.scene.pause();

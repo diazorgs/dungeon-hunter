@@ -32,6 +32,12 @@ export const PALETTE = {
   scrap: 0xffd23f,
   heal: 0x5fd16a,
   white: 0xffffff,
+  "moss-900": 0x14261c,
+  "moss-700": 0x23452a,
+  "moss-500": 0x3f7a34,
+  "moss-300": 0x8bb83f,
+  skin: 0xf2c49b,
+  "skin-dark": 0xb8754e,
 } as const;
 
 export type PaletteToken = keyof typeof PALETTE;

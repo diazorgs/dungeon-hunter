@@ -13,7 +13,7 @@ const TIMING: Record<string, [number, number]> = {
 };
 
 /**
- * Builds `runner.<id>.<anim>` and `boss.<id>.<anim>` from the atlas frame names, so new art
+ * Builds `<prefix>.<id>.<anim>` (runner, boss, guardian, weapon) from the atlas frame names, so new art
  * needs no code change. Call once after loading.
  */
 export function registerAnimations(scene: Phaser.Scene): void {

@@ -6,7 +6,6 @@ test("settings require every field", () =>
   expect(SettingsSchema.safeParse({}).success).toBe(false));
 test("default settings parse", () =>
   expect(SettingsSchema.parse(DEFAULT_SETTINGS)).toMatchObject({
-    aimMode: "soft",
     damageNumbers: false,
     screenShake: 1,
   }));

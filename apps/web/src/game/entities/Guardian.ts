@@ -1,6 +1,7 @@
 import type { Guardian as GuardianDef } from "@dh/shared";
 import Phaser from "phaser";
-import { textureFor } from "../content/textures.ts";
+import { playAnim } from "../content/animations.ts";
+import { resolveTexture, textureFor } from "../content/textures.ts";
 import { createEnemyHealth, damageEnemy, isStunned, stun } from "../logic/combat/enemyHealth.ts";
 import type { EnemyHealth } from "../logic/combat/enemyHealth.ts";
 import { spawnModifiers } from "../logic/spawn/modifiers.ts";
@@ -34,7 +35,7 @@ export class Guardian extends Phaser.Physics.Arcade.Sprite {
     uid: number,
     opts: GuardianSpawnOpts = {},
   ) {
-    const tex = textureFor("guardian", def.id);
+    const tex = resolveTexture(scene.textures, textureFor("guardian", def.id), "ph-guardian");
     super(scene, x, y, tex.key, tex.frame);
     this.def = def;
     this.uid = uid;
@@ -47,6 +48,7 @@ export class Guardian extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     this.setScale(mods.scale);
     this.resetLook();
+    playAnim(this, `guardian.${def.id}.idle`);
     if (def.speed === 0) this.setImmovable(true);
   }
 

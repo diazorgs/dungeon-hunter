@@ -23,9 +23,13 @@ export class SkillSystem {
     this.cooldown = new Cooldown(skill.cooldownMs);
   }
 
-  /** Does nothing while paused or on cooldown. */
+  /** Does nothing while paused; on cooldown it emits `skill:notready` so the press is felt. */
   tryActivate(ctx: SkillContext, now: number): boolean {
-    if (ctx.scene.scene.isPaused() || !this.cooldown.trigger(now)) return false;
+    if (ctx.scene.scene.isPaused()) return false;
+    if (!this.cooldown.trigger(now)) {
+      ctx.scene.events.emit("skill:notready");
+      return false;
+    }
     this.skill.activate(ctx, now);
     return true;
   }

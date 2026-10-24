@@ -1,5 +1,7 @@
 import type Phaser from "phaser";
+import { WALL_TOP_DEPTH } from "../content/rooms.ts";
 import { Door } from "../entities/Door.ts";
+import { autotile } from "../logic/dungeon/autotile.ts";
 import { TILE_PX } from "../logic/dungeon/compose.ts";
 import type { ComposedSector } from "../logic/dungeon/compose.ts";
 
@@ -12,7 +14,10 @@ export interface BuiltSector {
 
 const LOCKABLE = new Set(["combat", "boss"]);
 
-/** Renders a composed sector: one blank tilemap with floor, walls and decor layers, plus doors. */
+/**
+ * Renders a composed sector in 3/4 view: floor, decor and wall faces under the actors, wall caps
+ * over them, and an invisible full-wall layer for collision. Plus doors.
+ */
 export function buildSector(
   scene: Phaser.Scene,
   c: ComposedSector,
@@ -36,9 +41,12 @@ export function buildSector(
     l.putTilesAt(rows(data), 0, 0).setDepth(depth);
     return l;
   };
-  layer("floor", c.floor, 0);
+  const view = autotile(c.floor, c.walls, c.widthTiles);
+  layer("floor", view.floor, 0);
   layer("decor", c.decor, 10);
-  const wallLayer = layer("walls", c.walls, 10);
+  layer("faces", view.faces, 10);
+  layer("caps", view.caps, WALL_TOP_DEPTH);
+  const wallLayer = layer("walls", c.walls, 0).setVisible(false);
   wallLayer.setCollisionByExclusion([-1]);
 
   const doorGroup = scene.physics.add.staticGroup();

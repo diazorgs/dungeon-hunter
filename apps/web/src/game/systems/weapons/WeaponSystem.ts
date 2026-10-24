@@ -1,6 +1,7 @@
 import { WEAPONS } from "@dh/shared";
 import type { WeaponId } from "@dh/shared";
 import type Phaser from "phaser";
+import { resolveTexture, textureFor } from "../../content/textures.ts";
 import type { Player } from "../../entities/Player.ts";
 import { WeaponPickup } from "../../entities/WeaponPickup.ts";
 import { effectiveEnergyCost, effectiveFireRateMul } from "../../logic/combat/buffs.ts";
@@ -32,12 +33,16 @@ export class WeaponSystem {
   private readonly targets: CombatTargets;
   private readonly behaviours = new Map<string, Behaviour>();
   private lastBehaviour: Behaviour | null = null;
+  /** The active weapon drawn in the Runner's hand, pointing along the aim. */
+  private readonly held: Phaser.GameObjects.Image;
+  private heldId = "";
 
   constructor(scene: Phaser.Scene, player: Player, pool: BulletPool, targets: CombatTargets) {
     this.scene = scene;
     this.player = player;
     this.pool = pool;
     this.targets = targets;
+    this.held = scene.add.image(player.x, player.y, "ph-weapon").setOrigin(0.25, 0.6);
   }
 
   private behaviourFor(id: Behaviour["id"]): Behaviour {
@@ -55,7 +60,7 @@ export class WeaponSystem {
     if (input.swap && swap(this.loadout)) {
       this.delayActive(now);
       this.scene.events.emit("weapon:swapped", { active: this.activeId });
-    }
+    } else if (input.swap) this.scene.events.emit("weapon:swapfail");
 
     const p = this.player;
     const weapon = WEAPONS[this.activeId];
@@ -102,8 +107,30 @@ export class WeaponSystem {
       }
     }
     behaviour.update?.(ctx, dt);
+    this.drawHeld();
     if (this.wasHolding && !input.fire) behaviour.onRelease?.(ctx);
     this.wasHolding = input.fire;
+  }
+
+  private drawHeld(): void {
+    const p = this.player;
+    if (this.heldId !== this.activeId) {
+      this.heldId = this.activeId;
+      const tex = resolveTexture(
+        this.scene.textures,
+        textureFor("weapon", this.heldId),
+        "ph-weapon",
+      );
+      this.held.setTexture(tex.key, tex.frame);
+    }
+    const left = Math.cos(p.aimAngle) < 0;
+    // Hand height in the 16×24 sprite; behind the body while aiming up.
+    this.held
+      .setPosition(Math.round(p.x + (left ? -2 : 2)), Math.round(p.y + 4))
+      .setRotation(p.aimAngle)
+      .setFlipY(left)
+      .setDepth(p.depth + (Math.sin(p.aimAngle) < -0.5 ? -1 : 1))
+      .setVisible(p.visible && p.combat.hp > 0);
   }
 
   /** Dev helper: put a weapon in the active slot. */

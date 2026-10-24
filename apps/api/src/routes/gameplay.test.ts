@@ -39,7 +39,7 @@ test("GET /me returns a zeroed profile for a new account", async () => {
   expect(me.profile.coreShards).toBe(0);
   expect(me.unlocks).toEqual([]);
   expect(me.stats).toEqual({ totalRuns: 0, totalVictories: 0, bestVictorySec: null });
-  expect(me.settings.aimMode).toBe("soft");
+  expect(me.settings.damageNumbers).toBe(false);
 });
 test("GET /me without a session → 401", async () =>
   expect((await setup().get("/api/me")).status).toBe(401));
@@ -140,7 +140,6 @@ test("PUT /me/settings persists and GET /me returns it", async () => {
     version: 1,
     musicVolume: 0,
     sfxVolume: 0.5,
-    aimMode: "full",
     screenShake: 0,
     damageNumbers: true,
   };

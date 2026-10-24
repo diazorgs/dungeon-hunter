@@ -131,6 +131,23 @@ export class JuiceSystem {
       } else audio.play("sfx.shield-break", { volume: 0.6 });
     });
     on("player:dashed", () => audio.play("sfx.dash"));
+    on("skill:activated", (d: { x: number; y: number }) => {
+      const ring = scene.add.circle(d.x, d.y, 10, 0xf5b95a, 0).setStrokeStyle(2, 0xf5b95a);
+      ring.setDepth(6000);
+      scene.tweens.add({
+        targets: ring,
+        scale: 2.5,
+        alpha: 0,
+        duration: 260,
+        onComplete: () => ring.destroy(),
+      });
+      this.sparks.explode(12, d.x, d.y);
+      audio.play("sfx.charge", { volume: 0.6 });
+    });
+    // A press that cannot act (skill cooling down, no second weapon) still clicks.
+    on("skill:notready", () => audio.play("sfx.dryfire"));
+    on("weapon:swapfail", () => audio.play("sfx.dryfire"));
+    on("weapon:swapped", () => audio.play("sfx.pickup", { volume: 0.4 }));
     on("room:locked", () => audio.play("sfx.door-lock"));
     on("pickup:collected", () => audio.play("sfx.pickup", { volume: 0.5 }));
     on("room:cleared", () => audio.play("sfx.door-unlock"));

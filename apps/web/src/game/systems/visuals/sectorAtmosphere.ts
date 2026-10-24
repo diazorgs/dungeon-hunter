@@ -19,6 +19,8 @@ export function applySectorAtmosphere(
   const cam = scene.cameras.main;
   cam.filters.internal.clear();
   cam.filters.external.clear();
+  // Sector 1 is the overgrown wing: dark undergrowth between the rooms instead of void.
+  cam.setBackgroundColor(sector.id === 1 ? PALETTE["moss-900"] : PALETTE.void);
   if (sector.bleedLevel === 0) return;
 
   // Corrupted props glow on and off.

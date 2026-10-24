@@ -10,6 +10,8 @@ export const ROOM_CATALOG = catalog as TemplateMeta[];
 export const TILESET_KEY = "tiles-s1";
 /** Tile ids in tiles-s1.png (firstgid 1). */
 export const TILES = { corridorFloor: 2, corridorWall: 3 } as const;
+/** Wall caps and closed-door tops: over every actor (y + 1000), under bullets and effects. */
+export const WALL_TOP_DEPTH = 3000;
 
 export function queueRoomAssets(load: Phaser.Loader.LoaderPlugin): void {
   for (const n of [1, 2, 3]) load.image(`tiles-s${n}`, `assets/tilemaps/tiles-s${n}.png`);

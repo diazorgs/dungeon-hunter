@@ -1,8 +1,8 @@
 import { PALETTE, WEAPONS } from "@dh/shared";
 import type { LogId, WeaponId } from "@dh/shared";
 import Phaser from "phaser";
+import { ActionButtons } from "../hud/ActionButtons.ts";
 import { BossBar } from "../hud/BossBar.ts";
-import { DashPips } from "../hud/DashPips.ts";
 import { FullMap } from "../hud/FullMap.ts";
 import { ModPick } from "../hud/ModPick.ts";
 import { VendorPanel } from "../hud/VendorPanel.ts";
@@ -12,11 +12,9 @@ import { LogPanel } from "../hud/LogPanel.ts";
 import { RadioBox } from "../hud/RadioBox.ts";
 import { VigilBanner } from "../hud/VigilBanner.ts";
 import type { RadioLineIn } from "../hud/RadioBox.ts";
-import { ResourceBars } from "../hud/ResourceBars.ts";
 import { ScrapCounter } from "../hud/ScrapCounter.ts";
-import { SkillRing } from "../hud/SkillRing.ts";
+import { StatusOrb } from "../hud/StatusOrb.ts";
 import { Vignette } from "../hud/Vignette.ts";
-import { WeaponSlots } from "../hud/WeaponSlots.ts";
 import { effectiveEnergyCost } from "../logic/combat/buffs.ts";
 import { minimapCells } from "../logic/minimap.ts";
 import { SceneKey } from "./keys.ts";
@@ -24,13 +22,11 @@ import { SceneKey } from "./keys.ts";
 /** Screen-space HUD, parallel to the world scene, so camera shake never moves it. */
 export class HudScene extends Phaser.Scene {
   private source: HudSource | null = null;
-  private bars!: ResourceBars;
+  private status!: StatusOrb;
   private scrap!: ScrapCounter;
   private minimap!: Minimap;
   private fullMap!: FullMap;
-  private weapons!: WeaponSlots;
-  private skill!: SkillRing;
-  private dash!: DashPips;
+  private actions!: ActionButtons;
   modPick!: ModPick;
   vendor!: VendorPanel;
   radio!: RadioBox;
@@ -47,12 +43,10 @@ export class HudScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
     this.vignette = new Vignette(this);
-    this.bars = new ResourceBars(this, 4, 4);
-    this.scrap = new ScrapCounter(this, 4, 26);
+    this.status = new StatusOrb(this, 4, 4);
+    this.scrap = new ScrapCounter(this, 6, 40);
     this.minimap = new Minimap(this, width - 68, 4);
-    this.weapons = new WeaponSlots(this, width - 60, height - 52);
-    this.skill = new SkillRing(this, width - 52, height - 14);
-    this.dash = new DashPips(this, width - 60, height - 3);
+    this.actions = new ActionButtons(this, width, height);
     this.modPick = new ModPick(this);
     this.vendor = new VendorPanel(this);
     this.radio = new RadioBox(this);
@@ -126,13 +120,14 @@ export class HudScene extends Phaser.Scene {
     const s = this.source;
     if (!s) return;
     const now = s.player.scene.time.now;
-    this.bars.update(s.player.combat);
+    this.status.update(s.player.combat, s.player.runner.id);
     this.scrap.update(s.scrap());
-    this.weapons.update(s.weapons.loadout, (id: WeaponId) =>
-      effectiveEnergyCost(WEAPONS[id].energyPerShot, s.player.buffs, now),
-    );
     const cd = s.skills.cooldown;
-    this.skill.update(cd.progress(now), cd.remaining(now) / 1000);
-    this.dash.update(s.player.dashCharges(now), s.player.stats.dashCharges);
+    this.actions.update(
+      s.weapons.loadout,
+      (id: WeaponId) => effectiveEnergyCost(WEAPONS[id].energyPerShot, s.player.buffs, now),
+      { progress: cd.progress(now), remainingSec: cd.remaining(now) / 1000 },
+      { ready: s.player.dashCharges(now), max: s.player.stats.dashCharges },
+    );
   }
 }

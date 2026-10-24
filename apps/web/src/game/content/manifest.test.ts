@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
-import { BOSS_IDS, RUNNER_IDS } from "@dh/shared";
+import { BOSS_IDS, GUARDIAN_IDS, RUNNER_IDS, WEAPON_IDS } from "@dh/shared";
 import { expect, test } from "vite-plus/test";
 import { ATLASES } from "./manifest.ts";
 import { textureFor } from "./textures.ts";
@@ -14,6 +14,8 @@ const framesOf = (key: string): string[] => {
 test.each([
   ...RUNNER_IDS.map((id) => ["runner", id] as const),
   ...BOSS_IDS.map((id) => ["boss", id] as const),
+  ...GUARDIAN_IDS.map((id) => ["guardian", id] as const),
+  ...WEAPON_IDS.map((id) => ["weapon", id] as const),
 ])("%s %s has an atlas frame", (kind, id) => {
   const tex = textureFor(kind, id);
   expect(framesOf(tex.key)).toContain(tex.frame);

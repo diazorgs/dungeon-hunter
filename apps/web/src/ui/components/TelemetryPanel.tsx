@@ -5,7 +5,7 @@ import { safeLocalStorage } from "../../profile/local.ts";
 export function TelemetryPanel() {
   const s = summarizeTelemetry(readTelemetry(safeLocalStorage()));
   return (
-    <aside className="absolute right-4 bottom-4 border-2 border-dashed border-steel-700 p-2 text-base text-steel-400">
+    <aside className="border-2 border-dashed border-steel-700 px-2 py-1 text-sm text-steel-400">
       DEV telemetry · {s.runs} runs · median {s.medianMinutes.toFixed(1)} min · wins{" "}
       {Math.round(s.winRate * 100)}% · deaths S1/S2/S3 {s.deathsBySector[1]}/{s.deathsBySector[2]}/
       {s.deathsBySector[3]}

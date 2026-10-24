@@ -6,11 +6,11 @@ import { PixelButton } from "../components/PixelButton.tsx";
 
 // PRD controls table; fixed bindings, no remapping in the MVP.
 const KEYS: [string, string][] = [
-  ["Move", "WASD"],
-  ["Aim / fire", "Mouse / left click"],
-  ["Skill", "Right click or Space"],
-  ["Dash", "Shift"],
-  ["Swap weapon", "Q or mouse wheel"],
+  ["Move", "WASD or arrows"],
+  ["Attack (auto-aim)", "J (hold)"],
+  ["Skill", "K"],
+  ["Dash", "Space or Shift"],
+  ["Swap weapon", "Q"],
   ["Interact", "E"],
   ["Map", "Tab"],
   ["Pause", "Esc"],
@@ -69,24 +69,6 @@ export function SettingsScreen() {
               value={settings.screenShake}
               onChange={(v) => update({ screenShake: v })}
             />
-            <fieldset className="grid grid-cols-[160px_1fr] items-center gap-4">
-              <legend className="sr-only">Aim mode</legend>
-              <span aria-hidden>Aim</span>
-              <div className="flex gap-4">
-                {(["soft", "full"] as const).map((m) => (
-                  <label key={m} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="aim"
-                      checked={settings.aimMode === m}
-                      onChange={() => update({ aimMode: m })}
-                      className="accent-amber-500"
-                    />
-                    {m === "soft" ? "Soft assist" : "Full auto-aim"}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
             <label className="flex items-center gap-4">
               <input
                 type="checkbox"

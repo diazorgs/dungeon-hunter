@@ -1,10 +1,10 @@
+import { PALETTE } from "@dh/shared";
 import type { Runner, Settings } from "@dh/shared";
 import type Phaser from "phaser";
 import { Player } from "../entities/Player.ts";
 import type { InputState, Vec2 } from "../logic/input.ts";
 import { AimAssist } from "./AimAssist.ts";
 import { AudioSystem } from "./AudioSystem.ts";
-import { Crosshair } from "./Crosshair.ts";
 import { DamageNumbers } from "./DamageNumbers.ts";
 import { JuiceSystem } from "./JuiceSystem.ts";
 import { BossSystem } from "./BossSystem.ts";
@@ -29,7 +29,7 @@ export class CombatWorld {
   readonly bosses: BossSystem;
   readonly walls: Phaser.Types.Physics.Arcade.ArcadeColliderType;
   private readonly scene: Phaser.Scene;
-  private readonly crosshair: Crosshair;
+  private readonly shadows: Phaser.GameObjects.Graphics;
 
   constructor(
     scene: Phaser.Scene,
@@ -77,16 +77,16 @@ export class CombatWorld {
       this.audio,
       new DamageNumbers(scene, settings.damageNumbers),
     );
-    this.crosshair = new Crosshair(scene);
+    // Above floor and decor (10), below every actor (y + 1000).
+    this.shadows = scene.add.graphics().setDepth(11);
     this.bosses = new BossSystem(scene, this);
   }
 
-  update(input: InputState, now: number, dt: number, aimMode: "soft" | "full"): void {
-    this.crosshair.update(input.aimWorld, input.device, input.aimWorld);
+  update(input: InputState, now: number, dt: number): void {
     this.juice.tickHitStop(performance.now());
     if (this.juice.hitStopped) return;
     const ctx = { scene: this.scene, player: this.player, world: this };
-    this.player.aimAngle = this.aim.update(this.player, input.aimWorld, aimMode);
+    this.player.aimAngle = this.aim.update(this.player, input.aimWorld);
     this.player.tick(input, now, dt);
     if (input.skill) this.skills.tryActivate(ctx, now);
     this.skills.update(ctx, now, dt);
@@ -96,5 +96,16 @@ export class CombatWorld {
     this.hazards.update(now);
     this.playerBullets.update(now);
     this.enemyBullets.update(now);
+    this.drawShadows();
+  }
+
+  /** 3/4 view: a soft ellipse at each actor's feet grounds it on the floor. */
+  private drawShadows(): void {
+    const g = this.shadows.clear().fillStyle(PALETTE.ink, 0.45);
+    const actors: Phaser.GameObjects.Sprite[] = [this.player, ...this.guardians.alive()];
+    if (this.bosses.boss) actors.push(this.bosses.boss);
+    for (const a of actors)
+      if (a.active && a.visible)
+        g.fillEllipse(a.x, a.y + a.displayHeight / 2 - 1, a.displayWidth * 0.75, 4);
   }
 }

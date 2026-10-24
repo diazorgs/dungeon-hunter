@@ -9,8 +9,8 @@ import { ShardCount } from "../components/ShardCount.tsx";
 import { TelemetryPanel } from "../components/TelemetryPanel.tsx";
 
 const SKILL_TEXT = {
-  overcharge: "Overcharge: double fire rate, no energy cost.",
-  "patch-drone": "Patch Drone: a turret that auto-fires at enemies.",
+  overcharge: "Overcharge: double fire rate, free shots.",
+  "patch-drone": "Patch Drone: an auto-firing turret.",
 } as const;
 
 export function StagingBayScreen() {
@@ -22,13 +22,13 @@ export function StagingBayScreen() {
   const owned = availableRunners(profile.unlocks);
   const runnerId = owned.includes(selected) ? selected : "vex";
   return (
-    <div className="flex h-full flex-col gap-8 p-16">
+    <div className="flex h-full flex-col gap-6 px-12 pt-12 pb-6">
       <header className="flex items-baseline justify-between">
         <h1 className="text-[32px] text-steel-200">STAGING BAY</h1>
         <ShardCount shards={profile.coreShards} />
       </header>
-      <div className="grid flex-1 grid-cols-[1fr_256px] gap-8">
-        <Panel title="Choose a Runner">
+      <div className="grid min-h-0 flex-1 grid-cols-[1fr_224px] gap-6">
+        <Panel title="Choose a Runner" className="flex min-h-0 flex-col">
           <div className="grid grid-cols-2 gap-4" role="radiogroup" aria-label="Runner">
             {RUNNER_IDS.map((id) => {
               const r = RUNNERS[id];
@@ -41,30 +41,33 @@ export function StagingBayScreen() {
                   aria-checked={runnerId === id}
                   disabled={locked}
                   onClick={() => selectRunner(id)}
-                  className="h-full normal-case"
+                  className="flex items-start gap-3 normal-case"
                 >
-                  <span className="block text-2xl uppercase">
-                    {r.name} <span className="text-base text-steel-400">{r.title}</span>
-                  </span>
-                  <span className="mt-2 block text-base text-steel-300">
-                    HP {r.hp} · Shield {r.shield} · Energy {r.energy}
-                  </span>
-                  <span className="mt-2 block text-base text-steel-400">
-                    {SKILL_TEXT[r.skill.id]} {r.skill.durationSec}s, cooldown {r.skill.cooldownSec}
-                    s.
-                  </span>
-                  {locked ? (
-                    <span className="mt-2 block text-base text-scrap">
-                      Locked: unlock in the Armory for {price} Core Shards
+                  <img
+                    src={`/assets/sprites/portrait-${id}.png`}
+                    alt=""
+                    className={`h-[72px] w-12 shrink-0 ${locked ? "brightness-50" : ""}`}
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-2xl uppercase">
+                      {r.name} <span className="text-base text-steel-400">{r.title}</span>
                     </span>
-                  ) : null}
+                    <span className="mt-1 block text-sm text-steel-300">
+                      HP {r.hp} · SHD {r.shield} · EN {r.energy}
+                    </span>
+                    <span className="mt-1 block text-sm text-steel-400">
+                      {SKILL_TEXT[r.skill.id]} {r.skill.durationSec}s / {r.skill.cooldownSec}s
+                    </span>
+                    {locked ? (
+                      <span className="mt-1 block text-sm text-scrap">Locked · {price} shards</span>
+                    ) : null}
+                  </span>
                 </PixelButton>
               );
             })}
           </div>
-          <p className="mt-8 text-base text-steel-400">
-            Goal: reach the Core at the bottom of the Vault and shut it down. Every run earns Core
-            Shards, even when your Runner falls.
+          <p className="mt-auto pt-4 text-sm text-steel-400">
+            Goal: reach the Core and shut it down. Every run earns Core Shards.
           </p>
         </Panel>
         <Menu

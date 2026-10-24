@@ -8,7 +8,7 @@
     "dev": "vp run --parallel --filter @dh/web --filter @dh/api dev",
     "prepare": "vp config",
     "db:link": "supabase link",
-    "db:push": "supabase db push",
+    "db:push": "supabase db push --linked",
     "db:types": "supabase gen types typescript --linked > packages/shared/src/db.types.ts",
     "db:check-rls": "node --env-file=apps/api/.dev.vars apps/api/scripts/check-rls.ts"
   },

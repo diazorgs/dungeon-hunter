@@ -1,5 +1,7 @@
+# Copy to .dev.vars (gitignored). Values: Supabase dashboard → Project Settings → API Keys.
 SUPABASE_URL=https://<your-project-ref>.supabase.co
-SUPABASE_SECRET_KEY=<secret key from step 4>
+# Secret key (sb_secret_…). Only the API ever sees it; never put it in a VITE_ variable.
+SUPABASE_SECRET_KEY=<secret key>
 WEB_ORIGIN=http://localhost:5173
 # Only for `vp run db:check-rls` (the public key; the API itself never uses it).
 SUPABASE_PUBLISHABLE_KEY=<publishable key>

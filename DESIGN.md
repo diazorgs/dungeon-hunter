@@ -393,7 +393,8 @@ All request/response schemas live in `@dh/shared/schemas/api.ts`. `export type A
 
 ### 9.2 Auth and session
 
-- Register: `auth.admin.createUser({ email, password, email_confirm: true })`, insert `profiles` row (username unique), then sign in.
+- Register: `auth.admin.createUser({ email, password, email_confirm: true })`, insert `profiles` row (username unique), then sign in. (No email verification in the MVP: an address is not proven to belong to the player. Revisit before adding password reset or anything sent by email.)
+- Logout revokes the session server-side (`auth.admin.signOut(accessToken, "local")`) before clearing cookies.
 - Login: `auth.signInWithPassword`. Store access token in `dh_at` and refresh token in `dh_rt`, both `HttpOnly; Secure; SameSite=Lax; Path=/api`.
 - `sessionMiddleware`: verify access token; on expiry refresh with `dh_rt` and rewrite cookies; sets `c.var.userId`. Never read a user id from a body.
 - One Supabase client per request, created with `SUPABASE_SECRET_KEY` (bypasses RLS); sign-in and refresh each use a fresh client so no session leaks between calls. Access tokens are verified with `auth.getClaims(token)`.
@@ -410,7 +411,8 @@ As in SETUP.md §6, plus:
 
 - `profiles.imported_guest boolean not null default false`
 - `runs` index on `(profile_id, created_at desc)` for rate limiting
-- SQL function `leaderboard(period text, kind text, lim int)` returning one best row per profile.
+- SQL functions (`supabase/migrations/*_gameplay.sql`), each one call under a `for update` lock on the profile row: `award_run` (60 s rate limit, run row, new logs, shards), `purchase_unlock`, `import_guest`; plus `profile_stats` and `leaderboard(period, kind, limit)` (one best row per profile, weekly = since Monday 00:00 UTC). They raise their error code as the exception message; `db/supabaseRepo.ts` maps it.
+- `profiles.imported_runs`, `imported_victories`, `imported_best_victory_sec`: guest import keeps max(guest, account) counts without inventing run rows.
 - RLS enabled on every table with zero policies. The `anon`/`authenticated` roles get no grants beyond defaults.
 
 ---
@@ -556,7 +558,8 @@ The palette is exported once as `packages/shared/src/palette.ts` (`PALETTE` as `
 - CORS: `WEB_ORIGIN` only, `credentials: true`. Production serves `/api/*` on the same site as the web app.
 - Zod validates every body and query. Unknown keys are stripped.
 - Anti-cheat is the rule set in §7.4. It stops casual devtools cheating, not determined attackers; that is accepted for the MVP.
-- Guest import caps: shards ≤ 1000, unlocks must exist in `armory.json`, logs must exist in `logs.json`, once per account.
+- Guest import caps: shards capped (not rejected) at 1000, unknown unlocks and logs dropped silently, once per account.
+- The web keeps a finished run in `sessionStorage` (`profile/pendingRun.ts`) until the server accepts or rejects it, and resubmits it once after the next login.
 
 ---
 

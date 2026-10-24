@@ -18,12 +18,17 @@ export function ProfileRepositoryProvider({
   const qc = useQueryClient();
   useEffect(() => {
     let loaded = false;
-    void repo.loadSettings().then((s) => {
-      useSettingsStore.getState().replace(s);
-      loaded = true;
-    });
+    void repo
+      .loadSettings()
+      .then((s) => useSettingsStore.getState().replace(s))
+      .catch(() => undefined)
+      .finally(() => (loaded = true));
+    // Sliders fire many changes; persist the last one (one PUT for accounts, not dozens).
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const unsub = useSettingsStore.subscribe((s, prev) => {
-      if (loaded && s.settings !== prev.settings) void repo.saveSettings(s.settings);
+      if (!loaded || s.settings === prev.settings) return;
+      clearTimeout(timer);
+      timer = setTimeout(() => void repo.saveSettings(s.settings).catch(() => undefined), 400);
     });
     const offBus = bus.on("settings:changed", (s) => useSettingsStore.getState().replace(s));
     // Another tab wrote progress: refetch instead of overwriting it with our stale copy.
@@ -33,6 +38,7 @@ export function ProfileRepositoryProvider({
     addEventListener("storage", onStorage);
     void qc.invalidateQueries({ queryKey: PROFILE });
     return () => {
+      clearTimeout(timer);
       unsub();
       offBus();
       removeEventListener("storage", onStorage);

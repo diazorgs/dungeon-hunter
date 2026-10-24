@@ -44,10 +44,14 @@ export const RunRewardSchema = z.object({
   me: MeResponseSchema,
 });
 
+export const GUEST_IMPORT_MAX_SHARDS = 1000;
+
+// Lenient on purpose: oversized shards are capped and unknown ids are dropped by the API
+// (DESIGN.md §13), so an old or edited local profile still imports what is valid.
 export const GuestImportSchema = z.object({
-  coreShards: count().max(1000),
-  unlocks: z.array(ArmoryItemRefSchema),
-  vaultLogs: z.array(z.enum(LOG_IDS)),
+  coreShards: count().transform((n) => Math.min(n, GUEST_IMPORT_MAX_SHARDS)),
+  unlocks: z.array(ArmoryItemRefSchema).max(64),
+  vaultLogs: z.array(z.string().max(32)).max(64),
   stats: StatsSchema,
 });
 

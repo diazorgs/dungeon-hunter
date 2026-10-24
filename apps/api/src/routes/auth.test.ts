@@ -93,9 +93,19 @@ test("logout clears cookies (Max-Age=0)", async () => {
   expect(a.jar.size).toBe(0);
 });
 
+test("logout revokes the refresh token server-side", async () => {
+  const a = setup();
+  await a.register();
+  const rt = a.jar.get("dh_rt")!;
+  await a.post("/api/auth/logout");
+  a.jar.set("dh_rt", rt);
+  expect((await a.get("/api/session-check")).status).toBe(401);
+});
+
 test("body userId is ignored", async () => {
   const a = setup();
   const reg = (await (await a.register()).json()) as { profile: { id: string } };
+  expect(reg.profile).toMatchObject({ username: "runner_47", coreShards: 0 });
   const res = await a.post("/api/session-check", { userId: "someone-else" });
   // POST is not routed; GET with the cookie returns the cookie's user.
   expect(res.status).toBe(404);

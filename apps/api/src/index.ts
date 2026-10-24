@@ -5,7 +5,11 @@ import type { Repo } from "./db/repo.ts";
 import { createSupabaseRepo } from "./db/supabaseRepo.ts";
 import type { AppEnv, Bindings } from "./env.ts";
 import { apiError } from "./errors.ts";
+import { armoryRoutes } from "./routes/armory.ts";
 import { authRoutes } from "./routes/auth.ts";
+import { leaderboardRoutes } from "./routes/leaderboard.ts";
+import { meRoutes } from "./routes/me.ts";
+import { runRoutes } from "./routes/runs.ts";
 
 /** Routes depend only on `Repo`, so tests inject the memory repo (no Docker, no network). */
 export function createApp(makeRepo: (env: Bindings) => Repo) {
@@ -22,6 +26,10 @@ export function createApp(makeRepo: (env: Bindings) => Repo) {
   const routes = app
     .get("/health", (c) => c.json({ ok: true }))
     .route("/auth", authRoutes)
+    .route("/me", meRoutes)
+    .route("/runs", runRoutes)
+    .route("/armory", armoryRoutes)
+    .route("/leaderboard", leaderboardRoutes)
     .get("/session-check", sessionMiddleware, (c) => c.json({ userId: c.var.userId }));
   return routes;
 }

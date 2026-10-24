@@ -32,8 +32,8 @@ test("vex is always available; kit after unlock", () => {
 const stats = { totalRuns: 0, totalVictories: 0, bestVictorySec: null };
 test("guest import caps shards at 1000", () => {
   const ok = { coreShards: 1000, unlocks: [], vaultLogs: [], stats };
-  expect(GuestImportSchema.safeParse(ok).success).toBe(true);
-  expect(GuestImportSchema.safeParse({ ...ok, coreShards: 1001 }).success).toBe(false);
+  expect(GuestImportSchema.parse({ ...ok, coreShards: 5000 }).coreShards).toBe(1000);
+  expect(GuestImportSchema.safeParse({ ...ok, coreShards: -1 }).success).toBe(false);
 });
 test("register rejects bad usernames", () => {
   const ok = { email: "a@b.co", password: "12345678", username: "runner_047" };

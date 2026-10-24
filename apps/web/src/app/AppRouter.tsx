@@ -74,9 +74,11 @@ export function AppRouter() {
             pending={submit.isPending}
             error={
               submit.error
-                ? submit.error instanceof ProfileError
-                  ? submit.error.code
-                  : "Could not save this run."
+                ? submit.error instanceof ProfileError && submit.error.code === "UNAUTHORIZED"
+                  ? "Session expired. Log in again and this run is saved then."
+                  : submit.error instanceof ProfileError && !submit.error.code.startsWith("HTTP_5")
+                    ? submit.error.code
+                    : "Could not reach the server. Log in again later to save this run."
                 : null
             }
             onRunAgain={startRun}

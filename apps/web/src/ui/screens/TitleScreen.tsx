@@ -1,3 +1,5 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "../../app/repos.ts";
 import { useProfile } from "../../profile/queries.ts";
 import { useSessionStore } from "../../stores/session.ts";
 import { Menu } from "../components/Menu.tsx";
@@ -6,6 +8,12 @@ export function TitleScreen() {
   const goTo = useSessionStore((s) => s.goTo);
   const authMode = useSessionStore((s) => s.authMode);
   const { data: profile } = useProfile();
+  const qc = useQueryClient();
+  const logOut = async () => {
+    await api.api.auth.logout.$post().catch(() => undefined);
+    useSessionStore.setState({ authMode: "guest" });
+    await qc.invalidateQueries({ queryKey: ["profile"] });
+  };
   return (
     <div className="flex h-full flex-col items-center justify-center gap-16">
       <div className="text-center">
@@ -24,9 +32,9 @@ export function TitleScreen() {
               action: () => goTo(profile?.seenIntro ? "staging" : "intro"),
               disabled: !profile,
             },
-            ...(authMode === "guest"
-              ? [{ label: "Log in", action: () => goTo("auth", "title") }]
-              : []),
+            authMode === "guest"
+              ? { label: "Log in", action: () => goTo("auth", "title") }
+              : { label: "Log out", action: () => void logOut() },
             { label: "Settings", action: () => goTo("settings", "title") },
           ]}
         />

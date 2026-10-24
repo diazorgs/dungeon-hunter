@@ -2,12 +2,14 @@
 
 A top-down pixel roguelite shooter for desktop browsers. A Runner descends through three sectors of the Vault, fights guardians and three bosses, and tries to shut down the Core. Progress (Core Shards, Armory unlocks, Vault Logs) carries over between runs, for guests in the browser and for accounts on the server.
 
-- **Web** (`apps/web`): React 19 for every menu, Phaser 4 for the run, Tailwind 4, Zustand, TanStack Query.
-- **API** (`apps/api`): Hono on Cloudflare Workers, talking to Supabase (Postgres + Auth).
+- **Web** (`apps/web`): React 19 (with the React Compiler, via its Babel plugin) for every menu, Phaser 4 for the run, Tailwind 4, Zustand, TanStack Query.
+- **API** (`apps/api`): Hono on Cloudflare Workers (run locally with Wrangler), talking to Supabase (Postgres + Auth).
 - **Shared** (`packages/shared`, `packages/utils`): Zod schemas, game content as JSON, payout and anti-cheat rules, seeded RNG.
 - **Toolchain:** [Vite+](https://vite.plus) (`vp`), which wraps Vite, Vitest, Oxlint, Oxfmt and a task runner, on a pnpm workspace.
 
 The game is fully playable without any backend. Set up Supabase only if you want accounts, the leaderboard and server-side progress.
+
+This README is the single setup guide for the whole repo; the apps and packages have no READMEs of their own.
 
 ---
 
@@ -136,20 +138,21 @@ curl -s "localhost:8787/api/leaderboard?period=all&kind=fastest"
 
 ## 6. Everyday commands
 
-| Command                        | What it does                                               |
-| ------------------------------ | ---------------------------------------------------------- |
-| `vp run dev`                   | Web (5173) + API (8787)                                    |
-| `vp run @dh/web#dev`           | Web only (guest mode)                                      |
-| `vp check`                     | Format, lint (type-aware) and type-check; `--fix` to apply |
-| `vp run -r test`               | All tests in every package                                 |
-| `vp test path/to/file.test.ts` | One test file (run inside its package)                     |
-| `vp run -r build`              | Build everything                                           |
-| `vp run ready`                 | What CI runs: check, all tests, all builds                 |
-| `vp run db:push`               | Apply new migrations to the linked Supabase project        |
-| `vp run db:check-rls`          | Prove the public key can read, write and call nothing      |
-| `vp run @dh/web#rooms`         | Rebuild the room catalog after editing Tiled rooms         |
-| `vp run @dh/web#art`           | Regenerate the Runner and boss sprite atlases              |
-| `vp run @dh/web#music`         | Regenerate the six music loops                             |
+| Command                        | What it does                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------------- |
+| `vp run dev`                   | Web (5173) + API (8787)                                                            |
+| `vp run @dh/web#dev`           | Web only (guest mode)                                                              |
+| `vp check`                     | Format, lint (type-aware) and type-check; `--fix` to apply                         |
+| `vp run -r test`               | All tests in every package                                                         |
+| `vp test path/to/file.test.ts` | One test file (run inside its package)                                             |
+| `vp run -r build`              | Build everything                                                                   |
+| `vp run ready`                 | What CI runs: check, all tests, all builds                                         |
+| `vp run db:push`               | Apply new migrations to the linked Supabase project                                |
+| `vp run db:check-rls`          | Prove the public key can read, write and call nothing                              |
+| `vp run @dh/web#rooms`         | Rebuild the room catalog after editing Tiled rooms                                 |
+| `vp run @dh/web#art`           | Regenerate the Runner and boss sprite atlases                                      |
+| `vp run @dh/web#music`         | Regenerate the six music loops                                                     |
+| `vp run @dh/api#cf-typegen`    | Regenerate Worker binding types after adding bindings to `apps/api/wrangler.jsonc` |
 
 Tests import from `vite-plus/test`, never from `vitest`.
 

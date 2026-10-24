@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import armoryJson from "./data/armory.json" with { type: "json" };
+import cardsJson from "./data/cards.json" with { type: "json" };
 import bossesJson from "./data/bosses.json" with { type: "json" };
 import guardiansJson from "./data/guardians.json" with { type: "json" };
 import logsJson from "./data/logs.json" with { type: "json" };
@@ -12,6 +13,7 @@ import weaponsJson from "./data/weapons.json" with { type: "json" };
 import {
   ArmoryItemSchema,
   BossSchema,
+  CardsSchema,
   GuardianSchema,
   ModSchema,
   RadioLineSchema,
@@ -67,4 +69,5 @@ export const STARTER_WEAPON_POOL: WeaponId[] = WEAPON_IDS.filter((id) =>
 );
 export const BASE_MOD_POOL: ModId[] = MOD_IDS.filter((id) => MODS[id].inBasePool);
 
+export const CARDS = CardsSchema.parse(cardsJson);
 export const VENDOR_PRICES = VendorPricesSchema.parse(vendorJson);

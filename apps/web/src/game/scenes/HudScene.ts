@@ -1,5 +1,5 @@
 import { PALETTE, WEAPONS } from "@dh/shared";
-import type { WeaponId } from "@dh/shared";
+import type { LogId, WeaponId } from "@dh/shared";
 import Phaser from "phaser";
 import { BossBar } from "../hud/BossBar.ts";
 import { DashPips } from "../hud/DashPips.ts";
@@ -8,7 +8,9 @@ import { ModPick } from "../hud/ModPick.ts";
 import { VendorPanel } from "../hud/VendorPanel.ts";
 import type { HudSource } from "../hud/HudSource.ts";
 import { Minimap } from "../hud/Minimap.ts";
+import { LogPanel } from "../hud/LogPanel.ts";
 import { RadioBox } from "../hud/RadioBox.ts";
+import { VigilBanner } from "../hud/VigilBanner.ts";
 import type { RadioLineIn } from "../hud/RadioBox.ts";
 import { ResourceBars } from "../hud/ResourceBars.ts";
 import { ScrapCounter } from "../hud/ScrapCounter.ts";
@@ -32,6 +34,8 @@ export class HudScene extends Phaser.Scene {
   modPick!: ModPick;
   vendor!: VendorPanel;
   radio!: RadioBox;
+  logPanel!: LogPanel;
+  private banner!: VigilBanner;
   private bossBar!: BossBar;
   private vignette!: Vignette;
   private unbind: (() => void) | null = null;
@@ -52,6 +56,8 @@ export class HudScene extends Phaser.Scene {
     this.modPick = new ModPick(this);
     this.vendor = new VendorPanel(this);
     this.radio = new RadioBox(this);
+    this.banner = new VigilBanner(this);
+    this.logPanel = new LogPanel(this);
     this.bossBar = new BossBar(this);
     this.fullMap = new FullMap(this);
 
@@ -64,17 +70,6 @@ export class HudScene extends Phaser.Scene {
       this.game.events.off("hud:rebind", rebind),
     );
     rebind();
-
-    if (import.meta.env.DEV)
-      this.input.keyboard?.on("keydown-F7", () => {
-        this.radio.say({
-          speaker: "ops",
-          text: "Runner, you're in. Storage Wing ahead.",
-          durationMs: 2500,
-        });
-        this.radio.say({ speaker: "vigil", text: "INTRUDER DETECTED.", durationMs: 2000 });
-        this.radio.say({ speaker: "ops", text: "Ignore it. Keep moving.", durationMs: 2000 });
-      });
   }
 
   /** Re-attach to a (new) world; safe to call repeatedly, never duplicates listeners. */
@@ -97,11 +92,22 @@ export class HudScene extends Phaser.Scene {
       ["boss:hp", (d: { hp: number }) => this.bossBar.update(d.hp)],
       ["boss:dead", () => this.bossBar.hide()],
       ["radio:say", (line: RadioLineIn) => this.radio.say(line)],
+      ["radio:flush", () => this.radio.flush()],
+      [
+        "vigil:banner",
+        (d: { text: string; ms: number }) => this.banner.show(d.text, d.ms, this.time.now),
+      ],
+      [
+        "log:open",
+        (d: { id: LogId; isNew: boolean }) => this.logPanel.open(d.id, d.isNew, this.time.now),
+      ],
+      ["log:close", () => this.logPanel.close()],
     ];
     for (const [e, fn] of handlers) ev.on(e, fn);
     this.unbind = () => handlers.forEach(([e, fn]) => ev.off(e, fn));
     this.fullMap.close();
     this.bossBar.hide();
+    this.logPanel.close();
     this.renderMaps();
   }
 
@@ -115,6 +121,8 @@ export class HudScene extends Phaser.Scene {
 
   update(time: number) {
     this.radio.update(time);
+    this.banner.update(time);
+    this.logPanel.update(time);
     const s = this.source;
     if (!s) return;
     const now = s.player.scene.time.now;

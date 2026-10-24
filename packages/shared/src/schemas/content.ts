@@ -130,6 +130,7 @@ export const RADIO_BEATS = [
   "core-chamber",
   "victory",
   "death",
+  "vigil-sealed",
 ] as const;
 
 export const RadioLineSchema = z.object({
@@ -167,6 +168,13 @@ export const VaultLogSchema = z.object({
   lines: z.array(z.string()).min(2).max(4),
 });
 
+export const CardSchema = z.object({
+  id: z.string(),
+  art: z.string(),
+  lines: z.array(z.string()).min(1).max(3),
+});
+export const CardsSchema = z.object({ intro: z.array(CardSchema), ending: z.array(CardSchema) });
+
 export type Runner = z.infer<typeof RunnerSchema>;
 export type Weapon = z.infer<typeof WeaponSchema>;
 export type WeaponBehaviour = Weapon["behaviour"];
@@ -178,4 +186,5 @@ export type ArmoryItem = z.infer<typeof ArmoryItemSchema>;
 export type RadioLine = z.infer<typeof RadioLineSchema>;
 export type VaultLog = z.infer<typeof VaultLogSchema>;
 export type SectorConfig = z.infer<typeof SectorConfigSchema>;
+export type Card = z.infer<typeof CardSchema>;
 export type VendorPrices = z.infer<typeof VendorPricesSchema>;

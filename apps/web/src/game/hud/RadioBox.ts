@@ -6,11 +6,15 @@ export interface RadioLineIn {
   speaker: "ops" | "vigil";
   text: string;
   durationMs: number;
+  /** VIGIL after the Hydra falls: the line jitters to hint at the corruption. */
+  glitch?: boolean;
 }
 
 const CHARS_PER_SEC = 40;
 const MAX_VISIBLE = 2;
 const FADE_MS = 300;
+// Wide enough for a 70-char line in one row, clear of the weapon slots on the right.
+const BOX_W = 360;
 
 interface Showing {
   line: RadioLineIn;
@@ -28,8 +32,8 @@ export class RadioBox {
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.bg = scene.add
-      .rectangle(4, scene.scale.height - 34, 220, 30, PALETTE.ink, 0.8)
-      .setOrigin(0)
+      .rectangle(4, scene.scale.height - 4, BOX_W, 30, PALETTE.ink, 0.8)
+      .setOrigin(0, 1)
       .setVisible(false);
   }
 
@@ -37,10 +41,18 @@ export class RadioBox {
     this.queue.push(line);
   }
 
+  /** Drops everything queued or showing (death, run end). */
+  flush(): void {
+    this.queue.length = 0;
+    for (const s of this.showing) s.text.destroy();
+    this.showing = [];
+    this.bg.setVisible(false);
+  }
+
   update(now: number): void {
     while (this.showing.length < MAX_VISIBLE && this.queue.length) {
       const line = this.queue.shift()!;
-      const text = hudText(this.scene, 8, 0, "#cfd8e6").setWordWrapWidth(212);
+      const text = hudText(this.scene, 8, 0, "#cfd8e6").setWordWrapWidth(BOX_W - 8);
       this.showing.push({ line, startedAt: now, text });
     }
     for (const s of this.showing) {
@@ -55,7 +67,15 @@ export class RadioBox {
     }
     for (const s of this.showing.filter((x) => x.text.alpha <= 0)) s.text.destroy();
     this.showing = this.showing.filter((x) => x.text.active);
-    this.showing.forEach((s, i) => s.text.setPosition(8, this.scene.scale.height - 31 + i * 13));
+    // Stack upward from the bottom by real height, so a wrapped line never overlaps the next.
+    let y = this.scene.scale.height - 6;
+    for (const s of [...this.showing].reverse()) {
+      // 2-frame jitter every ~quarter second.
+      const jx = s.line.glitch && Math.floor(now / 16) % 16 < 2 ? 1 : 0;
+      y -= s.text.height;
+      s.text.setPosition(8 + jx, y);
+    }
+    this.bg.setSize(BOX_W, this.scene.scale.height - 4 - y + 2);
     this.bg.setVisible(this.showing.length > 0);
   }
 }

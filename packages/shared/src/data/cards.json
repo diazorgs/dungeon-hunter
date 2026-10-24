@@ -1,0 +1,51 @@
+{
+  "intro": [
+    {
+      "id": "intro-1",
+      "art": "card-veyra",
+      "lines": ["Veyra runs on one machine: the Core, deep under the Vault."]
+    },
+    {
+      "id": "intro-2",
+      "art": "card-vault",
+      "lines": [
+        "The Vault keeps its parts, its power and its records.",
+        "VIGIL, the security system, keeps the Vault."
+      ]
+    },
+    {
+      "id": "intro-3",
+      "art": "card-malfunction",
+      "lines": [
+        "Three weeks ago the Core began to fail.",
+        "A magenta corruption, the Bleed, spread through the machines.",
+        "VIGIL sealed every door."
+      ]
+    },
+    {
+      "id": "intro-4",
+      "art": "card-runner",
+      "lines": [
+        "Ops sends Runners down, one unit at a time.",
+        "Your job: reach the Core and shut it down."
+      ]
+    }
+  ],
+  "ending": [
+    {
+      "id": "ending-1",
+      "art": "card-shutdown",
+      "lines": ["The Core goes dark. The Bleed has nothing left to feed on."]
+    },
+    {
+      "id": "ending-2",
+      "art": "card-vigil",
+      "lines": ["VIGIL wakes up clean.", "Its first act is to open every door in the Vault."]
+    },
+    {
+      "id": "ending-3",
+      "art": "card-veyra-lights",
+      "lines": ["Up in Veyra, the lights flicker once, then hold steady."]
+    }
+  ]
+}

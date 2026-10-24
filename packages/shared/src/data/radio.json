@@ -2,8 +2,113 @@
   {
     "id": "s1-enter-1",
     "beat": "s1-enter",
+    "speaker": "ops",
+    "text": "Runner, you're in. This is Ops. Storage Wing is ahead.",
+    "durationMs": 3500
+  },
+  {
+    "id": "s1-enter-2",
+    "beat": "s1-enter",
+    "speaker": "ops",
+    "text": "Reach the Core and shut it down. Veyra's grid depends on it.",
+    "durationMs": 4000
+  },
+  {
+    "id": "s1-enter-3",
+    "beat": "s1-enter",
     "speaker": "vigil",
     "text": "INTRUDER DETECTED.",
     "durationMs": 3000
+  },
+  {
+    "id": "gatekeeper-dead-1",
+    "beat": "gatekeeper-dead",
+    "speaker": "ops",
+    "text": "Gatekeeper's down. The lift to the Conduit Works is open.",
+    "durationMs": 3500
+  },
+  {
+    "id": "gatekeeper-dead-2",
+    "beat": "gatekeeper-dead",
+    "speaker": "ops",
+    "text": "Step on the pad when you're ready. Go deeper.",
+    "durationMs": 3000
+  },
+  {
+    "id": "s2-enter-1",
+    "beat": "s2-enter",
+    "speaker": "ops",
+    "text": "Conduit Works. The Bleed is in the machines here too.",
+    "durationMs": 3500
+  },
+  {
+    "id": "s2-enter-2",
+    "beat": "s2-enter",
+    "speaker": "ops",
+    "text": "That magenta glow is spreading faster than our scans said.",
+    "durationMs": 4000
+  },
+  {
+    "id": "hydra-dead-1",
+    "beat": "hydra-dead",
+    "speaker": "vigil",
+    "text": "INTRUDER. YOU ARE DAMAGING THE... THE NORMAL STATE.",
+    "durationMs": 3500
+  },
+  {
+    "id": "hydra-dead-2",
+    "beat": "hydra-dead",
+    "speaker": "ops",
+    "text": "Did VIGIL just stutter? Never heard it do that. Keep going.",
+    "durationMs": 4000
+  },
+  {
+    "id": "s3-enter-1",
+    "beat": "s3-enter",
+    "speaker": "ops",
+    "text": "Core Approach. Your signal is breaking up, Runner.",
+    "durationMs": 3500
+  },
+  {
+    "id": "s3-enter-2",
+    "beat": "s3-enter",
+    "speaker": "ops",
+    "text": "If you lose me, the Core is straight down. Shut it off.",
+    "durationMs": 4000
+  },
+  {
+    "id": "core-chamber-1",
+    "beat": "core-chamber",
+    "speaker": "vigil",
+    "text": "RUNNER. THE CORE IS HEALTHY. THE CORE IS ME.",
+    "durationMs": 3500
+  },
+  {
+    "id": "core-chamber-2",
+    "beat": "core-chamber",
+    "speaker": "vigil",
+    "text": "WARDEN, WAKE. PROTECT THE NORMAL STATE.",
+    "durationMs": 3500
+  },
+  {
+    "id": "victory-1",
+    "beat": "victory",
+    "speaker": "vigil",
+    "text": "Core offline. Corruption purged. Thank you, Runner.",
+    "durationMs": 4500
+  },
+  {
+    "id": "death-1",
+    "beat": "death",
+    "speaker": "ops",
+    "text": "Runner? Runner, respond... Signal lost.",
+    "durationMs": 3000
+  },
+  {
+    "id": "vigil-sealed-1",
+    "beat": "vigil-sealed",
+    "speaker": "vigil",
+    "text": "INTRUDER. SECTOR SEALED.",
+    "durationMs": 1500
   }
 ]

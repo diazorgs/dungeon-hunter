@@ -1,4 +1,4 @@
-import { RADIO, RUNNERS, SECTORS } from "@dh/shared";
+import { RUNNERS, SECTORS } from "@dh/shared";
 import { createRng } from "@dh/utils";
 import Phaser from "phaser";
 import { bus } from "../bridge/bus.ts";
@@ -16,13 +16,17 @@ import { heal } from "../logic/combat/combatant.ts";
 import type { CombatantState } from "../logic/combat/combatant.ts";
 import type { Loadout } from "../logic/weapons/loadout.ts";
 import { LiftPad } from "../entities/LiftPad.ts";
+import { LogTerminal } from "../entities/LogTerminal.ts";
+import { BeatLog } from "../logic/story/beats.ts";
+import { pickLogForRoom } from "../logic/story/logs.ts";
+import { NarrativeDirector } from "../systems/NarrativeDirector.ts";
 import { VendorTerminal } from "../entities/VendorTerminal.ts";
 import { applySectorAtmosphere } from "../systems/visuals/sectorAtmosphere.ts";
 import { playShutdown } from "./ShutdownSequence.ts";
 import { gainEnergy } from "../logic/combat/combatant.ts";
 import { rollVendorStock, tryBuy } from "../logic/vendor.ts";
 import type { VendorItem } from "../logic/vendor.ts";
-import { spendScrap } from "../logic/run/runState.ts";
+import { addLog, spendScrap } from "../logic/run/runState.ts";
 import type { RunState } from "../logic/run/runState.ts";
 import { toRunResult, toRunSummary } from "../logic/run/summary.ts";
 import { LootSystem } from "../systems/LootSystem.ts";
@@ -49,6 +53,8 @@ interface Carry {
   loadout: Loadout;
 }
 const LIFT_RANGE = 20;
+const LOG_RANGE = 24;
+const FADE_IN_MS = 400;
 const LIFT_HEAL = 2;
 const SECTOR_BOSS: Record<SectorId, BossId> = {
   1: "gatekeeper",
@@ -68,6 +74,8 @@ export class DungeonScene extends Phaser.Scene {
   private readonly visited = new Set<number>();
   private lift: LiftPad | null = null;
   private vendor: VendorTerminal | null = null;
+  private logTerminal: LogTerminal | null = null;
+  private logOpen = false;
   world!: CombatWorld;
 
   constructor() {
@@ -136,6 +144,26 @@ export class DungeonScene extends Phaser.Scene {
         )
       : null;
     if (this.vendor) this.physics.add.collider(this.world.player, this.vendor);
+    // Beats fire once per run, so the log outlives sector restarts like RunState does.
+    const beats = (this.registry.get("beatLog") as BeatLog | undefined) ?? new BeatLog();
+    this.registry.set("beatLog", beats);
+    new NarrativeDirector(this, SECTOR, seed, beats);
+    const logAt = sector.spawns.find((sp) => sp.kind === "log");
+    this.logOpen = false;
+    this.logTerminal = logAt
+      ? new LogTerminal(
+          this,
+          logAt.x,
+          logAt.y,
+          pickLogForRoom(
+            SECTOR,
+            this.runConfig.collectedLogIds,
+            this.run.logsFound,
+            createRng(seed).fork(`log:s${SECTOR}`),
+          ),
+        )
+      : null;
+    if (this.logTerminal) this.physics.add.collider(this.world.player, this.logTerminal);
     const goldRng = createRng(seed).fork(`mods:gold:s${SECTOR}`);
     this.events.on("chest:gold-opened", async (chest: Chest) => {
       const choices = rollModChoices(
@@ -193,9 +221,11 @@ export class DungeonScene extends Phaser.Scene {
       Object.assign(this.world.weapons.loadout, structuredClone(carry.loadout));
       this.registry.remove("carry");
     }
-    const beat = SECTORS[SECTOR].radioEnterBeat;
-    for (const line of RADIO.filter((l) => l.beat === beat)) this.events.emit("radio:say", line);
-    this.events.emit("sector:entered", { sector: SECTOR });
+    // The sector's radio beat waits for the fade-in, so it never plays under a black screen.
+    this.cameras.main.fadeIn(FADE_IN_MS);
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_IN_COMPLETE, () =>
+      this.events.emit("sector:entered", { sector: SECTOR }),
+    );
 
     if (import.meta.env.DEV) {
       this.input.keyboard?.on("keydown-F9", () => this.abandon());
@@ -225,6 +255,7 @@ export class DungeonScene extends Phaser.Scene {
       input.interact = false;
       void this.openVendor(this.vendor);
     }
+    this.updateLogTerminal(input);
     if (
       input.interact &&
       this.lift &&
@@ -240,6 +271,24 @@ export class DungeonScene extends Phaser.Scene {
     if (input.pause) {
       this.scene.launch(SceneKey.Pause, { from: SceneKey.Dungeon });
       this.scene.pause();
+    }
+  }
+
+  /** E toggles the log panel; walking away closes it. Reading a log is never a pause. */
+  private updateLogTerminal(input: { interact: boolean }): void {
+    const t = this.logTerminal;
+    if (!t) return;
+    const p = this.world.player;
+    const near = Math.hypot(t.x - p.x, t.y - p.y) <= LOG_RANGE;
+    if (this.logOpen && (!near || input.interact)) {
+      input.interact = false;
+      this.logOpen = false;
+      this.events.emit("log:close");
+    } else if (near && input.interact) {
+      input.interact = false;
+      this.logOpen = true;
+      const isNew = addLog(this.run, t.logId) && !this.runConfig.collectedLogIds.includes(t.logId);
+      this.events.emit("log:open", { id: t.logId, isNew });
     }
   }
 

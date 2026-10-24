@@ -203,6 +203,18 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
       f(PALETTE.scrap, 6, 14, 4, 3)
     ),
   ],
+  "ph-log-terminal": [
+    12,
+    16,
+    (_, f) => (
+      f(PALETTE["steel-700"], 0, 0, 12, 16),
+      f(PALETTE.ink, 1, 1, 10, 8),
+      f(PALETTE["teal-200"], 2, 2, 8, 1),
+      f(PALETTE["teal-200"], 2, 4, 5, 1),
+      f(PALETTE["teal-400"], 2, 6, 7, 1),
+      f(PALETTE["steel-500"], 3, 11, 6, 3)
+    ),
+  ],
   "ph-arm": [
     10,
     10,

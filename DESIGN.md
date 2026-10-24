@@ -538,11 +538,11 @@ The palette is exported once as `packages/shared/src/palette.ts` (`PALETTE` as `
 
 ## 12. Narrative system
 
-- Beats (`radio.json` `beat` field): `intro`, `s1-enter`, `gatekeeper-dead`, `s2-enter`, `hydra-dead`, `s3-enter`, `core-chamber`, `victory`, `death`.
-- `DungeonScene` emits beats into the HUD radio box; text never pauses combat.
-- VIGIL warnings ("INTRUDER. SECTOR SEALED.") use a separate glitch-styled banner at top-centre for 1.5 s when doors lock.
+- Beats (`radio.json` `beat` field): `intro`, `s1-enter`, `gatekeeper-dead`, `s2-enter`, `hydra-dead`, `s3-enter`, `core-chamber`, `victory`, `death`, `vigil-sealed`.
+- `systems/NarrativeDirector.ts` maps dungeon events to beats (`logic/story/beats.ts`, each beat once per run via a `BeatLog` kept in the game registry) and emits `radio:say` / `vigil:banner` / `radio:flush` on the dungeon scene's events; the HUD draws them, so text never pauses combat. The sector-enter beat waits for the 400 ms camera fade-in. Ops lines in Sector 3 pass through `degradeText(…, 2)`; VIGIL lines after `hydra-dead` jitter.
+- VIGIL warnings ("INTRUDER. SECTOR SEALED.") use a separate glitch-styled banner at top-centre for 1.5 s on the first door lock of a sector, then a 0.6 s `SEALED.` flash.
 - Vault Logs: 9 entries, 3 per sector. A log room, when generated, offers one uncollected log of that sector (falls back to a collected one). Logs found are part of `RunResult.logsFound` and saved to the profile.
-- Intro cards (4) and ending cards are React screens; intro shows on first launch, skippable; ending shows on first victory.
+- Intro cards (4) and ending cards are React screens (`cards.json`, `CardSchema`); intro shows on first launch, skippable; ending shows on first victory.
 
 ---
 

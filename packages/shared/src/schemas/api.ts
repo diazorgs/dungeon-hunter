@@ -10,14 +10,17 @@ export const ArmoryItemRefSchema = z.object({
   itemId: z.string().min(1).max(64),
 });
 
+// " Foo@Bar.com " and "foo@bar.com" are the same account.
+const Email = z.string().trim().toLowerCase().pipe(z.email());
+
 export const RegisterSchema = z.object({
-  email: z.email(),
+  email: Email,
   password: z.string().min(8).max(128),
   username: z.string().regex(/^[a-z0-9_]{3,16}$/),
 });
 
 export const LoginSchema = z.object({
-  email: z.email(),
+  email: Email,
   password: z.string().min(1).max(128),
 });
 

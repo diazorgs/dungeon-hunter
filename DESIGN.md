@@ -105,17 +105,17 @@ dungeon-hunter/
 
 ## 3. Commands
 
-| Purpose                   | Command                                                                          |
-| ------------------------- | -------------------------------------------------------------------------------- |
-| Install                   | `vp install`                                                                     |
-| Dev (web 5173 + api 8787) | `vp run dev`                                                                     |
-| Format, lint, typecheck   | `vp check` (`vp check --fix` to apply)                                           |
-| All tests                 | `vp run -r test`                                                                 |
-| One package's tests       | `vp test` inside the package, or `vp run @dh/web#test`                           |
-| One test file             | `vp test src/game/logic/combat/damage.test.ts` (inside the package)              |
-| Everything CI runs        | `vp run ready`                                                                   |
-| Rebuild room catalog      | `vp run @dh/web#rooms` (after editing Tiled rooms)                               |
-| Local DB                  | `pnpm exec supabase start` / `db reset` / `gen types` (scripts added in plan 24) |
+| Purpose                   | Command                                                                                             |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| Install                   | `vp install`                                                                                        |
+| Dev (web 5173 + api 8787) | `vp run dev`                                                                                        |
+| Format, lint, typecheck   | `vp check` (`vp check --fix` to apply)                                                              |
+| All tests                 | `vp run -r test`                                                                                    |
+| One package's tests       | `vp test` inside the package, or `vp run @dh/web#test`                                              |
+| One test file             | `vp test src/game/logic/combat/damage.test.ts` (inside the package)                                 |
+| Everything CI runs        | `vp run ready`                                                                                      |
+| Rebuild room catalog      | `vp run @dh/web#rooms` (after editing Tiled rooms)                                                  |
+| Database (Supabase cloud) | `vp run db:link` once, then `vp run db:push`; `vp run db:check-rls` proves the public key is denied |
 
 ---
 
@@ -396,7 +396,9 @@ All request/response schemas live in `@dh/shared/schemas/api.ts`. `export type A
 - Register: `auth.admin.createUser({ email, password, email_confirm: true })`, insert `profiles` row (username unique), then sign in.
 - Login: `auth.signInWithPassword`. Store access token in `dh_at` and refresh token in `dh_rt`, both `HttpOnly; Secure; SameSite=Lax; Path=/api`.
 - `sessionMiddleware`: verify access token; on expiry refresh with `dh_rt` and rewrite cookies; sets `c.var.userId`. Never read a user id from a body.
-- One Supabase client per request, created with `SUPABASE_SECRET_KEY` (bypasses RLS).
+- One Supabase client per request, created with `SUPABASE_SECRET_KEY` (bypasses RLS); sign-in and refresh each use a fresh client so no session leaks between calls. Access tokens are verified with `auth.getClaims(token)`.
+- Emails are trimmed and lowercased by `RegisterSchema` / `LoginSchema`. A taken username deletes the just-created auth user (no orphans).
+- The project runs against Supabase cloud (no local Docker stack). `db.types.ts` is not generated yet: the repo maps rows by hand in `db/supabaseRepo.ts`; run `vp run db:types` after linking if typed queries are wanted.
 
 ### 9.3 Error format
 

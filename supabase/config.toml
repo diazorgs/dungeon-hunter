@@ -1,0 +1,11 @@
+# Supabase CLI project config. The game uses a cloud project:
+#   pnpm exec supabase link --project-ref <ref>
+#   pnpm exec supabase db push
+project_id = "dungeon-hunter"
+
+[db]
+major_version = 17
+
+[auth]
+# The API creates users with email_confirm: true; no confirmation mail in the MVP.
+enable_signup = false

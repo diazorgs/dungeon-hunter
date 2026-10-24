@@ -146,6 +146,11 @@ export default defineConfig({
         },
       },
       {
+        // Workers runtime (console, crypto, fetch) and node scripts.
+        files: ["apps/api/**/*.ts"],
+        env: { worker: true, node: true },
+      },
+      {
         // DESIGN.md §2.2: pure logic has no rendering, UI or store imports.
         files: ["apps/web/src/game/logic/**"],
         rules: {

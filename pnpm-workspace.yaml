@@ -24,6 +24,7 @@ catalog:
   zod: ^4.6.7
   "@cloudflare/workers-types": ^5.20261022.1
   wrangler: ^4.110.0
+  supabase: ^2.122.0
 overrides:
   vite@*: "catalog:"
 peerDependencyRules:
@@ -34,9 +35,20 @@ peerDependencyRules:
 allowBuilds:
   esbuild: true
   workerd: true
+  supabase: true
 permissions:
   phaser:
     skills: true
 skills:
   dirs:
     - .claude/skills
+minimumReleaseAgeExclude:
+  - "@supabase/cli-darwin-arm64@2.122.0"
+  - "@supabase/cli-darwin-x64@2.122.0"
+  - "@supabase/cli-linux-arm64-musl@2.122.0"
+  - "@supabase/cli-linux-arm64@2.122.0"
+  - "@supabase/cli-linux-x64-musl@2.122.0"
+  - "@supabase/cli-linux-x64@2.122.0"
+  - "@supabase/cli-windows-arm64@2.122.0"
+  - "@supabase/cli-windows-x64@2.122.0"
+  - supabase@2.122.0

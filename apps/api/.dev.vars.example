@@ -1,3 +1,5 @@
 SUPABASE_URL=https://<your-project-ref>.supabase.co
 SUPABASE_SECRET_KEY=<secret key from step 4>
 WEB_ORIGIN=http://localhost:5173
+# Only for `vp run db:check-rls` (the public key; the API itself never uses it).
+SUPABASE_PUBLISHABLE_KEY=<publishable key>

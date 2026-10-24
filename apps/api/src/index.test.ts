@@ -1,5 +1,8 @@
 import { expect, test } from "vite-plus/test";
-import app from "./index.ts";
+import { createApp } from "./index.ts";
+import { createMemoryRepo } from "./db/memoryRepo.ts";
+
+const app = createApp(() => createMemoryRepo());
 
 const env = { SUPABASE_URL: "", SUPABASE_SECRET_KEY: "", WEB_ORIGIN: "http://localhost:5173" };
 

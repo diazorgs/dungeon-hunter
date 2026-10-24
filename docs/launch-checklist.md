@@ -11,8 +11,8 @@ Gate (PRD M7): public URL live; no crash in 20 consecutive runs. Tick each box w
 
 ## 2. Database (Supabase cloud)
 
-- [ ] `vp run db:link` (needs the project ref and DB password), then `vp run db:push`: both migrations applied.
-- [ ] Add `SUPABASE_PUBLISHABLE_KEY` to `apps/api/.dev.vars`, run `vp run db:check-rls`: every table and function prints `denied`, exit 0.
+- [x] `vp run db:link` (needs the project ref and DB password), then `vp run db:push`: both migrations applied. _2026-10-24, project `rvimlhgtkseiadjjkqqs`._
+- [x] Add `SUPABASE_PUBLISHABLE_KEY` to `apps/api/.dev.vars`, run `vp run db:check-rls`: every table and function prints `denied`, exit 0. _2026-10-24: 5 tables + 4 functions denied._
 - [ ] Auth settings: email signups through the API only (`supabase/config.toml` `enable_signup = false` for the public endpoint), password minimum 8.
 
 ## 3. API (Cloudflare Workers)

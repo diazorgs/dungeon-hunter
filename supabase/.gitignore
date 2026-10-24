@@ -1,0 +1,4 @@
+# Supabase CLI local state (linked project, versions); never commit.
+.branches
+.temp
+.env

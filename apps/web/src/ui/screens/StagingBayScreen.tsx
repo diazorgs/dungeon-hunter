@@ -6,6 +6,7 @@ import { Menu } from "../components/Menu.tsx";
 import { Panel } from "../components/Panel.tsx";
 import { PixelButton } from "../components/PixelButton.tsx";
 import { ShardCount } from "../components/ShardCount.tsx";
+import { TelemetryPanel } from "../components/TelemetryPanel.tsx";
 
 const SKILL_TEXT = {
   overcharge: "Overcharge: double fire rate, no energy cost.",
@@ -78,6 +79,7 @@ export function StagingBayScreen() {
           onBack={() => goTo("title")}
         />
       </div>
+      {import.meta.env.DEV ? <TelemetryPanel /> : null}
     </div>
   );
 }

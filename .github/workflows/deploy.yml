@@ -1,0 +1,39 @@
+name: Deploy
+
+# Production deploys run only from a version tag, after the full CI gate.
+# The `production` environment should require the owner's approval in the repo settings
+# (Settings → Environments → production → Required reviewers).
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          node-version: "24"
+          cache: true
+      - run: vp run ready
+      - run: apps/web/scripts/check-prod-bundle.sh
+      - name: Refuse placeholder production config
+        run: |
+          if grep -q PUBLIC_HOST apps/api/wrangler.jsonc; then
+            echo "Set the production host in apps/api/wrangler.jsonc first (docs/launch-checklist.md)." >&2
+            exit 1
+          fi
+      - name: Deploy API (Cloudflare Workers)
+        working-directory: apps/api
+        run: vp exec wrangler deploy --minify --env production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Deploy web (Cloudflare Pages)
+        working-directory: apps/api
+        run: vp exec wrangler pages deploy ../web/dist --project-name dungeon-hunter --branch main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

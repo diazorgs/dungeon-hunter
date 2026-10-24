@@ -13,7 +13,8 @@ export type Screen =
   | "settings"
   | "run"
   | "results"
-  | "ending";
+  | "ending"
+  | "crash";
 
 interface SessionState {
   screen: Screen;
@@ -22,9 +23,11 @@ interface SessionState {
   selectedRunnerId: RunnerId;
   runConfig: RunConfig | null;
   lastRunSummary: RunSummary | null;
+  crashMessage: string | null;
   authMode: "guest" | "account";
   startRun: (config: RunConfig) => void;
   endRun: (summary: RunSummary) => void;
+  crash: (message: string) => void;
   goTo: (screen: Exclude<Screen, "run">, backTo?: Screen) => void;
   selectRunner: (id: RunnerId) => void;
 }
@@ -35,9 +38,11 @@ export const useSessionStore = create<SessionState>()((set) => ({
   selectedRunnerId: "vex",
   runConfig: null,
   lastRunSummary: null,
+  crashMessage: null,
   authMode: "guest",
   startRun: (runConfig) => set({ screen: "run", runConfig, selectedRunnerId: runConfig.runnerId }),
   endRun: (lastRunSummary) => set({ screen: "results", lastRunSummary, runConfig: null }),
+  crash: (crashMessage) => set({ screen: "crash", crashMessage, runConfig: null }),
   goTo: (screen, backTo) => set((s) => ({ screen, backTo: backTo ?? s.backTo })),
   selectRunner: (selectedRunnerId) => set({ selectedRunnerId }),
 }));

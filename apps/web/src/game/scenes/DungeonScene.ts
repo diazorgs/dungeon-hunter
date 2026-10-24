@@ -38,6 +38,9 @@ import { rollModChoices } from "../logic/mods/choices.ts";
 import type { HudScene } from "./HudScene.ts";
 import { loadedTemplates, ROOM_CATALOG, TILES } from "../content/rooms.ts";
 import { composeSector, TILE_PX, wallAt } from "../logic/dungeon/compose.ts";
+import type { ComposedSector } from "../logic/dungeon/compose.ts";
+import { recordRunTelemetry } from "../logic/telemetry.ts";
+import { safeLocalStorage } from "../../profile/local.ts";
 import { generateSector } from "../logic/dungeon/generate.ts";
 import { assignTemplates } from "../logic/dungeon/templates.ts";
 import { CameraDirector } from "../systems/CameraDirector.ts";
@@ -76,6 +79,7 @@ export class DungeonScene extends Phaser.Scene {
   private vendor: VendorTerminal | null = null;
   private logTerminal: LogTerminal | null = null;
   private logOpen = false;
+  private sectorRooms: ComposedSector["rooms"] = [];
   world!: CombatWorld;
 
   constructor() {
@@ -106,6 +110,7 @@ export class DungeonScene extends Phaser.Scene {
       createRng(seed).fork(`templates:s${SECTOR}`),
     );
     const sector = composeSector(layout, loadedTemplates(this.cache.json), TILES);
+    this.sectorRooms = sector.rooms;
     const built = buildSector(this, sector, SECTORS[SECTOR].tileset);
     applySectorAtmosphere(this, SECTORS[SECTOR], sector);
     const width = sector.widthTiles * TILE_PX;
@@ -398,6 +403,18 @@ export class DungeonScene extends Phaser.Scene {
     if (import.meta.env.DEV) {
       const check = validateRun(toRunResult(this.run));
       if (!check.ok) console.warn("RunResult would be rejected:", check.reason, summary);
+      const roomId = roomAt(this.world.player, this.sectorRooms);
+      recordRunTelemetry(
+        summary,
+        {
+          deathRoomType:
+            summary.outcome === "death"
+              ? this.sectorRooms.find((r) => r.id === roomId)?.type
+              : undefined,
+          weaponsUsed: this.world.weapons.loadout.slots.filter((id) => id !== null),
+        },
+        { storage: safeLocalStorage() },
+      );
     }
     bus.emit("run:ended", summary);
   }

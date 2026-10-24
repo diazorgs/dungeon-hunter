@@ -6,6 +6,7 @@ import { useSessionStore } from "../stores/session.ts";
 import { Stage } from "../ui/components/Stage.tsx";
 import { ArmoryScreen } from "../ui/screens/ArmoryScreen.tsx";
 import { AuthScreen } from "../ui/screens/AuthScreen.tsx";
+import { CrashScreen } from "../ui/screens/CrashScreen.tsx";
 import { EndingScreen } from "../ui/screens/EndingScreen.tsx";
 import { IntroScreen } from "../ui/screens/IntroScreen.tsx";
 import { LeaderboardScreen } from "../ui/screens/LeaderboardScreen.tsx";
@@ -26,6 +27,7 @@ export function AppRouter() {
   const runConfig = useSessionStore((s) => s.runConfig);
   const summary = useSessionStore((s) => s.lastRunSummary);
   const endRun = useSessionStore((s) => s.endRun);
+  const crash = useSessionStore((s) => s.crash);
   const submit = useSubmitRun();
   const startRun = useStartRun();
   const submitted = useRef("");
@@ -43,7 +45,7 @@ export function AppRouter() {
   if (screen === "run" && runConfig)
     return (
       <Suspense fallback={<div className="h-full bg-void" />}>
-        <PhaserGame config={runConfig} onRunEnded={onRunEnded} />
+        <PhaserGame config={runConfig} onRunEnded={onRunEnded} onCrash={crash} />
       </Suspense>
     );
   return <Stage>{renderScreen()}</Stage>;
@@ -66,6 +68,8 @@ export function AppRouter() {
         return <SettingsScreen />;
       case "ending":
         return <EndingScreen />;
+      case "crash":
+        return <CrashScreen />;
       case "results":
         return summary ? (
           <ResultsScreen

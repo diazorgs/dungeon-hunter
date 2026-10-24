@@ -563,6 +563,12 @@ The palette is exported once as `packages/shared/src/palette.ts` (`PALETTE` as `
 
 ---
 
+## 13.1 Production and crash handling
+
+- `/api/*` runs on the same site as the web app (`apps/api/wrangler.jsonc` `env.production`); the web is on Cloudflare Pages. `.github/workflows/deploy.yml` deploys on a `v*` tag after `vp run ready` and `apps/web/scripts/check-prod-bundle.sh`.
+- `PhaserGame` is lazy-loaded (its own chunk). While a run is mounted, `game/errorHandler.ts` turns an uncaught error (not DOMException rejections) into the `crash` screen; `app/ErrorBoundary.tsx` does the same for React render errors.
+- DEV builds record runs locally (`game/logic/telemetry.ts`) for the balance pass; production never does.
+
 ## 14. Naming and code conventions
 
 - Files: `PascalCase.ts` for classes (entities, scenes, systems), `camelCase.ts` for modules of functions, `*.test.ts` beside the code.
@@ -592,4 +598,4 @@ The palette is exported once as `packages/shared/src/palette.ts` (`PALETTE` as `
 
 ## 16. Open questions
 
-- Public name before launch (PRD suggests _Hollow Vault_ or _Vault Runner_).
+- Public name before launch (PRD suggests _Hollow Vault_ or _Vault Runner_). Tracked in `docs/launch-checklist.md` §1.

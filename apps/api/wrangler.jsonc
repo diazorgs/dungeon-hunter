@@ -7,4 +7,14 @@
   "vars": {
     "WEB_ORIGIN": "http://localhost:5173",
   },
+  "env": {
+    // Deploy: wrangler deploy --env production. Replace PUBLIC_HOST / PUBLIC_ZONE first (docs/launch-checklist.md).
+    // /api/* is served on the same site as the web app, so the SameSite=Lax cookies work.
+    "production": {
+      "name": "dungeon-hunter-api",
+      "routes": [{ "pattern": "PUBLIC_HOST/api/*", "zone_name": "PUBLIC_ZONE" }],
+      // Must equal the real site origin exactly, or auth cookies silently break.
+      "vars": { "WEB_ORIGIN": "https://PUBLIC_HOST" },
+    },
+  },
 }

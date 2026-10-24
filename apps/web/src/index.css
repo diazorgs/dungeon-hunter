@@ -1,1 +1,64 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Silkscreen";
+  src: url("/assets/fonts/ui.woff2") format("woff2");
+  font-display: block;
+}
+
+/* DESIGN.md §11.2: mirrors PALETTE in @dh/shared (ui/theme.test.ts keeps them equal). */
+@theme {
+  --font-pixel: "Silkscreen", ui-monospace, monospace;
+  --color-void: #0b0d12;
+  --color-ink: #141821;
+  --color-steel-900: #1c2230;
+  --color-steel-800: #263042;
+  --color-steel-700: #34415a;
+  --color-steel-600: #47587a;
+  --color-steel-500: #5f7399;
+  --color-steel-400: #8296b8;
+  --color-steel-300: #a9b8d1;
+  --color-steel-200: #cfd8e6;
+  --color-bone: #eef2f7;
+  --color-rust-700: #5a2e1c;
+  --color-rust-500: #9a4a26;
+  --color-amber-500: #e08a2e;
+  --color-amber-300: #f5b95a;
+  --color-amber-100: #fde3a7;
+  --color-teal-800: #0f3b40;
+  --color-teal-600: #1d6b6b;
+  --color-teal-400: #2fa3a0;
+  --color-teal-200: #7fe0d4;
+  --color-bleed-900: #3a0b2e;
+  --color-bleed-700: #7a1257;
+  --color-bleed-500: #d81b8c;
+  --color-bleed-300: #ff4fbf;
+  --color-bleed-100: #ffb3e6;
+  --color-hp: #e0343b;
+  --color-hp-dark: #7a1520;
+  --color-shield: #9fd8ff;
+  --color-energy: #3d7bff;
+  --color-scrap: #ffd23f;
+  --color-heal: #5fd16a;
+  --color-white: #ffffff;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  background: var(--color-void);
+  color: var(--color-steel-300);
+}
+
+body {
+  font-family: var(--font-pixel);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+}
+
+img,
+canvas {
+  image-rendering: pixelated;
+}

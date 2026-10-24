@@ -342,6 +342,7 @@ interface ProfileRepository {
   load(): Promise<Profile>;
   submitRun(result: RunResult): Promise<RunReward>; // { shardsAwarded, newLogIds, profile }
   purchase(item: ArmoryItemRef): Promise<Profile>;
+  loadSettings(): Promise<Settings>; // settings travel with the profile's backend
   saveSettings(settings: Settings): Promise<void>;
   markSeen(flag: "intro" | "ending"): Promise<Profile>; // per-device flags, stay local for accounts
 }
@@ -350,7 +351,7 @@ interface ProfileRepository {
 - `submitRun` resolves to `RunReward = { shardsAwarded, newLogIds, rejected?, profile }`.
 - `LocalProfileRepository` (guest, M5): `localStorage['dh.profile.v1']`, computes payout with the same shared rules.
 - `ApiProfileRepository` (account, M6): calls the Hono RPC client.
-- TanStack Query hooks (`useProfile`, `useSubmitRun`, `usePurchase`) depend only on the interface. The active repository is chosen by session state.
+- TanStack Query hooks (`useProfile`, `useSubmitRun`, `usePurchase`) depend only on the interface. The run is submitted from the `run:ended` handler in `AppRouter` (once per run, keyed by seed + duration + kills), not from a Results effect. The active repository is chosen by session state.
 - Every persisted blob has `version`; `migrateLocalProfile(raw) → Profile` upgrades or resets.
 
 ### 8.2 Client state (Zustand)
@@ -482,7 +483,7 @@ The palette is exported once as `packages/shared/src/palette.ts` (`PALETTE` as `
 
 ### 11.3 Typography
 
-- One pixel font for React and Phaser (OFL or CC0 licensed, recorded in CREDITS.md).
+- One pixel font for React and Phaser: **Silkscreen** (OFL 1.1, `public/assets/fonts/ui.woff2`, recorded in CREDITS.md).
 - Phaser: BitmapText generated from the same font (`assets/fonts/ui.fnt`), sizes 8 and 16 internal px only.
 - React: `@font-face` with `font-smooth: never; -webkit-font-smoothing: none`; sizes 16 / 24 / 32 / 48 CSS px (multiples of 8).
 

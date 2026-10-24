@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { MenuMusic } from "../MenuMusic.tsx";
 
 const W = 960;
 const H = 540;
@@ -26,6 +27,7 @@ export function Stage({ children }: { children: ReactNode }) {
         >
           {children}
         </main>
+        <MenuMusic src="/assets/audio/music/lobby.wav" />
       </div>
     </div>
   );

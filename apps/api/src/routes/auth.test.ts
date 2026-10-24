@@ -102,6 +102,15 @@ test("logout revokes the refresh token server-side", async () => {
   expect((await a.get("/api/session-check")).status).toBe(401);
 });
 
+test("logout with an expired access token still revokes the refresh token", async () => {
+  const a = setup({ accessTtlSec: 60 });
+  await a.register();
+  a.repo.clock.now += 120_000;
+  await a.post("/api/auth/logout");
+  // No live refresh token is left for the user (the rotated one was revoked too).
+  expect(a.repo._refreshTokens.size).toBe(0);
+});
+
 test("body userId is ignored", async () => {
   const a = setup();
   const reg = (await (await a.register()).json()) as { profile: { id: string } };

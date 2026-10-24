@@ -74,7 +74,8 @@ export function createMemoryRepo(opts: { accessTtlSec?: number } = {}) {
     },
     async signOut(accessToken) {
       const a = access.get(accessToken);
-      if (!a) return;
+      // Like Supabase: an expired JWT can't sign anything out.
+      if (!a || a.exp <= clock.now / 1000) return;
       for (const [t, v] of access) if (v.userId === a.userId) access.delete(t);
       for (const [t, id] of refreshTokens) if (id === a.userId) refreshTokens.delete(t);
     },
@@ -183,5 +184,10 @@ export function createMemoryRepo(opts: { accessTtlSec?: number } = {}) {
         }));
     },
   };
-  return Object.assign(repo, { _users: users, _profiles: profiles, clock });
+  return Object.assign(repo, {
+    _users: users,
+    _profiles: profiles,
+    _refreshTokens: refreshTokens,
+    clock,
+  });
 }

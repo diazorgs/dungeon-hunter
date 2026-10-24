@@ -31,9 +31,16 @@ export const authRoutes = new Hono<AppEnv>()
     return c.json(await c.var.repo.getMe(session.userId), 200);
   })
   .post("/logout", async (c) => {
-    const { access } = readSessionCookies(c);
-    // Best effort: an already-expired token has nothing left to revoke.
-    if (access) await c.var.repo.signOut(access).catch(() => undefined);
+    const repo = c.var.repo;
+    const { access, refresh } = readSessionCookies(c);
+    // An expired access token can't revoke anything; trade the refresh token for a live one first.
+    const live =
+      access && (await repo.verifyAccessToken(access))
+        ? access
+        : refresh
+          ? (await repo.refresh(refresh))?.accessToken
+          : undefined;
     clearSessionCookies(c);
+    if (live) await repo.signOut(live);
     return c.body(null, 204);
   });

@@ -2,6 +2,7 @@ import { PALETTE, SECTORS } from "@dh/shared";
 import type { ModId, SectorId } from "@dh/shared";
 import Phaser from "phaser";
 import { hudText } from "../hud/text.ts";
+import { prefetchMusic } from "../systems/AudioSystem.ts";
 import type { DungeonScene } from "./DungeonScene.ts";
 import { SceneKey } from "./keys.ts";
 
@@ -18,6 +19,8 @@ export class LiftScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.add.rectangle(0, 0, width, height, PALETTE.ink, 0.85).setOrigin(0);
     const next = SECTORS[Math.min(3, data.from + 1) as SectorId];
+    // Download the next sector's track during the mod pick, not after the descent.
+    prefetchMusic(this, next.music);
     hudText(this, width / 2, 24, "#e08a2e")
       .setOrigin(0.5, 0)
       .setText(`LIFT  ·  ${SECTORS[data.from].name.toUpperCase()}  →  ${next.name.toUpperCase()}`);

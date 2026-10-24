@@ -10,7 +10,8 @@
     "preview": "vp preview",
     "test": "vp test",
     "rooms": "node scripts/build-room-catalog.ts",
-    "art": "node scripts/gen-art.ts"
+    "art": "node scripts/gen-art.ts",
+    "music": "node scripts/gen-music.ts"
   },
   "dependencies": {
     "@dh/shared": "workspace:^",

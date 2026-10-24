@@ -191,6 +191,15 @@ export class DungeonScene extends Phaser.Scene {
       if (at) this.lift = new LiftPad(this, at.x, at.y);
     });
     this.events.on("player:died", () => this.die());
+    // Music: the sector track after the fade-in, boss tracks during fights.
+    const audio = this.world.audio;
+    this.events.on("sector:entered", () => audio.playMusic(SECTORS[SECTOR].music));
+    this.events.on("boss:spawned", () =>
+      audio.playMusic(SECTOR === 3 ? "music.warden" : "music.boss"),
+    );
+    this.events.on("boss:dead", (d: { id: BossId }) => {
+      if (d.id !== "core-warden") audio.playMusic(SECTORS[SECTOR].music);
+    });
     if (import.meta.env.DEV)
       Object.assign((window as unknown as { __dh: object }).__dh, {
         giveMod: (id: ModId) =>

@@ -140,6 +140,16 @@ export const RadioLineSchema = z.object({
   durationMs: int().positive(),
 });
 
+export const VendorPricesSchema = z.object({
+  weaponPrice: z.object({
+    common: int().positive(),
+    rare: int().positive(),
+    epic: int().positive(),
+  }),
+  health: z.object({ price: int().positive(), amount: int().positive() }),
+  energy: z.object({ price: int().positive(), amount: int().positive() }),
+});
+
 export const SectorConfigSchema = z.object({
   id: SectorSchema,
   name: z.string(),
@@ -168,3 +178,4 @@ export type ArmoryItem = z.infer<typeof ArmoryItemSchema>;
 export type RadioLine = z.infer<typeof RadioLineSchema>;
 export type VaultLog = z.infer<typeof VaultLogSchema>;
 export type SectorConfig = z.infer<typeof SectorConfigSchema>;
+export type VendorPrices = z.infer<typeof VendorPricesSchema>;

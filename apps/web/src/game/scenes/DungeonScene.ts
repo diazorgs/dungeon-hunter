@@ -16,16 +16,22 @@ import { heal } from "../logic/combat/combatant.ts";
 import type { CombatantState } from "../logic/combat/combatant.ts";
 import type { Loadout } from "../logic/weapons/loadout.ts";
 import { LiftPad } from "../entities/LiftPad.ts";
+import { VendorTerminal } from "../entities/VendorTerminal.ts";
+import { applySectorAtmosphere } from "../systems/visuals/sectorAtmosphere.ts";
+import { gainEnergy } from "../logic/combat/combatant.ts";
+import { rollVendorStock, tryBuy } from "../logic/vendor.ts";
+import type { VendorItem } from "../logic/vendor.ts";
+import { spendScrap } from "../logic/run/runState.ts";
 import type { RunState } from "../logic/run/runState.ts";
 import { toRunResult, toRunSummary } from "../logic/run/summary.ts";
 import { LootSystem } from "../systems/LootSystem.ts";
 import { ModSystem } from "../systems/ModSystem.ts";
-import { MOD_IDS, modPool, validateRun } from "@dh/shared";
+import { MOD_IDS, dropPool, modPool, validateRun } from "@dh/shared";
 import type { BossId, ModId, SectorId } from "@dh/shared";
 import type { Chest } from "../entities/Chest.ts";
 import { rollModChoices } from "../logic/mods/choices.ts";
 import type { HudScene } from "./HudScene.ts";
-import { loadedTemplates, ROOM_CATALOG, TILES, TILESET_KEY } from "../content/rooms.ts";
+import { loadedTemplates, ROOM_CATALOG, TILES } from "../content/rooms.ts";
 import { composeSector, TILE_PX, wallAt } from "../logic/dungeon/compose.ts";
 import { generateSector } from "../logic/dungeon/generate.ts";
 import { assignTemplates } from "../logic/dungeon/templates.ts";
@@ -60,6 +66,7 @@ export class DungeonScene extends Phaser.Scene {
   private encounters!: EncounterSystem;
   private readonly visited = new Set<number>();
   private lift: LiftPad | null = null;
+  private vendor: VendorTerminal | null = null;
   world!: CombatWorld;
 
   constructor() {
@@ -90,7 +97,8 @@ export class DungeonScene extends Phaser.Scene {
       createRng(seed).fork(`templates:s${SECTOR}`),
     );
     const sector = composeSector(layout, loadedTemplates(this.cache.json), TILES);
-    const built = buildSector(this, sector, TILESET_KEY);
+    const built = buildSector(this, sector, SECTORS[SECTOR].tileset);
+    applySectorAtmosphere(this, SECTORS[SECTOR], sector);
     const width = sector.widthTiles * TILE_PX;
     const height = sector.heightTiles * TILE_PX;
     this.physics.world.setBounds(0, 0, width, height);
@@ -113,6 +121,20 @@ export class DungeonScene extends Phaser.Scene {
     });
     this.loot = new LootSystem(this, this.world, this.run, sector, SECTOR);
     this.mods = new ModSystem(this, this.world.player, this.run, this.world.guardians);
+    const vendorAt = sector.spawns.find((sp) => sp.kind === "vendor");
+    this.vendor = vendorAt
+      ? new VendorTerminal(
+          this,
+          vendorAt.x,
+          vendorAt.y,
+          rollVendorStock(
+            createRng(seed).fork(`vendor:s${SECTOR}`),
+            dropPool(this.runConfig.unlockedWeaponIds),
+            SECTOR,
+          ),
+        )
+      : null;
+    if (this.vendor) this.physics.add.collider(this.world.player, this.vendor);
     const goldRng = createRng(seed).fork(`mods:gold:s${SECTOR}`);
     this.events.on("chest:gold-opened", async (chest: Chest) => {
       const choices = rollModChoices(
@@ -170,6 +192,10 @@ export class DungeonScene extends Phaser.Scene {
     if (import.meta.env.DEV) {
       this.input.keyboard?.on("keydown-F9", () => this.abandon());
       this.input.keyboard?.on("keydown-F8", () => this.rebuildSector());
+      // F6: clear the room (kills every live guardian) to walk a seed quickly.
+      this.input.keyboard?.on("keydown-F6", () => {
+        for (const g of this.world.guardians.alive()) g.takeHit(9999, 0, 0, this.time.now);
+      });
     }
   }
 
@@ -183,6 +209,14 @@ export class DungeonScene extends Phaser.Scene {
     const input = this.input$.read(this.cameras.main, this.world.player);
     if (this.loot.tryInteract(input)) input.interact = false;
     const p = this.world.player;
+    if (
+      input.interact &&
+      this.vendor &&
+      Math.hypot(this.vendor.x - p.x, this.vendor.y - p.y) <= LIFT_RANGE + 8
+    ) {
+      input.interact = false;
+      void this.openVendor(this.vendor);
+    }
     if (
       input.interact &&
       this.lift &&
@@ -210,6 +244,35 @@ export class DungeonScene extends Phaser.Scene {
     return id;
   }
 
+  /** Vendor panel: Scrap for weapons, health, energy. A weapon with both slots full drops the active one. */
+  private async openVendor(terminal: VendorTerminal): Promise<void> {
+    const hud = this.scene.get(SceneKey.Hud) as HudScene;
+    if (hud.vendor.isOpen) return;
+    const p = this.world.player;
+    const buy = (item: VendorItem): string | null => {
+      const c = p.combat;
+      const check = tryBuy(terminal.stock, item, {
+        scrap: this.run.scrap,
+        hpFull: c.hp >= c.maxHp,
+        energyFull: c.energy >= c.maxEnergy,
+      });
+      if (!check.ok) return check.reason;
+      spendScrap(this.run, check.cost);
+      if (item.kind === "weapon") {
+        const w = terminal.stock.weapons[item.index]!;
+        w.sold = true;
+        const dropped = this.world.weapons.onPickup(w.id);
+        if (dropped) this.world.weapons.dropOnFloor(dropped, terminal.x, terminal.y + 18);
+      } else if (item.kind === "health") heal(c, terminal.stock.health.amount);
+      else gainEnergy(c, terminal.stock.energy.amount);
+      this.events.emit("pickup:collected", { kind: item.kind, amount: 1 });
+      return null;
+    };
+    this.input$.blocked = true;
+    await hud.vendor.open(terminal.stock, () => this.run.scrap, buy);
+    this.input$.blocked = false;
+  }
+
   /** Lift: freeze the world, heal 2 HP, a non-cancellable mod pick, then descend. */
   private startLift(): void {
     this.lift?.destroy();
@@ -227,15 +290,6 @@ export class DungeonScene extends Phaser.Scene {
 
   /** Called by LiftScene after the pick. */
   descend(): void {
-    const next = (this.run.sector + 1) as SectorId;
-    const hasNext =
-      next <= 3 && ROOM_CATALOG.some((t) => t.roomType === "start" && t.sectors.includes(next));
-    if (!hasNext) {
-      // Sectors 2–3 arrive in plan 19; until then the slice ends here.
-      if (import.meta.env.DEV) console.info("Slice complete");
-      this.abandon();
-      return;
-    }
     advanceSector(this.run);
     this.rebuildSector();
   }

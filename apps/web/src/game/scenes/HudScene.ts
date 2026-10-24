@@ -5,6 +5,7 @@ import { BossBar } from "../hud/BossBar.ts";
 import { DashPips } from "../hud/DashPips.ts";
 import { FullMap } from "../hud/FullMap.ts";
 import { ModPick } from "../hud/ModPick.ts";
+import { VendorPanel } from "../hud/VendorPanel.ts";
 import type { HudSource } from "../hud/HudSource.ts";
 import { Minimap } from "../hud/Minimap.ts";
 import { RadioBox } from "../hud/RadioBox.ts";
@@ -29,6 +30,7 @@ export class HudScene extends Phaser.Scene {
   private skill!: SkillRing;
   private dash!: DashPips;
   modPick!: ModPick;
+  vendor!: VendorPanel;
   radio!: RadioBox;
   private bossBar!: BossBar;
   private vignette!: Vignette;
@@ -48,6 +50,7 @@ export class HudScene extends Phaser.Scene {
     this.skill = new SkillRing(this, width - 52, height - 14);
     this.dash = new DashPips(this, width - 60, height - 3);
     this.modPick = new ModPick(this);
+    this.vendor = new VendorPanel(this);
     this.radio = new RadioBox(this);
     this.bossBar = new BossBar(this);
     this.fullMap = new FullMap(this);

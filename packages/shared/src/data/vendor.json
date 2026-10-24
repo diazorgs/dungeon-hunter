@@ -1,0 +1,15 @@
+{
+  "weaponPrice": {
+    "common": 18,
+    "rare": 35,
+    "epic": 60
+  },
+  "health": {
+    "price": 12,
+    "amount": 2
+  },
+  "energy": {
+    "price": 8,
+    "amount": 60
+  }
+}

@@ -6,9 +6,27 @@
     "doors": ["N", "E", "S", "W"]
   },
   {
+    "id": "boss-s2",
+    "roomType": "boss",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
     "id": "chest",
     "roomType": "chest",
     "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "chest-s2",
+    "roomType": "chest",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "chest-s3",
+    "roomType": "chest",
+    "sectors": [3],
     "doors": ["N", "E", "S", "W"]
   },
   {
@@ -42,15 +60,117 @@
     "doors": ["N", "E", "S", "W"]
   },
   {
+    "id": "combat-s2-01",
+    "roomType": "combat",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s2-02",
+    "roomType": "combat",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s2-03",
+    "roomType": "combat",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s2-04",
+    "roomType": "combat",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s2-05",
+    "roomType": "combat",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s3-01",
+    "roomType": "combat",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s3-02",
+    "roomType": "combat",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s3-03",
+    "roomType": "combat",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s3-04",
+    "roomType": "combat",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "combat-s3-05",
+    "roomType": "combat",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "core-chamber",
+    "roomType": "boss",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
     "id": "log",
     "roomType": "log",
     "sectors": [1],
     "doors": ["N", "E", "S", "W"]
   },
   {
+    "id": "log-s2",
+    "roomType": "log",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "log-s3",
+    "roomType": "log",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
     "id": "start",
     "roomType": "start",
     "sectors": [1],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "start-s2",
+    "roomType": "start",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "start-s3",
+    "roomType": "start",
+    "sectors": [3],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "vendor-s2",
+    "roomType": "vendor",
+    "sectors": [2],
+    "doors": ["N", "E", "S", "W"]
+  },
+  {
+    "id": "vendor-s3",
+    "roomType": "vendor",
+    "sectors": [3],
     "doors": ["N", "E", "S", "W"]
   }
 ]

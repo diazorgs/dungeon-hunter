@@ -192,6 +192,17 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
       f(PALETTE["bleed-300"], 6, 6, 4, 4)
     ),
   ],
+  "ph-vendor": [
+    16,
+    20,
+    (_, f) => (
+      f(PALETTE["steel-700"], 0, 0, 16, 20),
+      f(PALETTE.ink, 2, 2, 12, 9),
+      f(PALETTE["teal-200"], 3, 3, 10, 2),
+      f(PALETTE["teal-400"], 3, 7, 6, 1),
+      f(PALETTE.scrap, 6, 14, 4, 3)
+    ),
+  ],
   "ph-spark": [2, 2, (_, f) => f(PALETTE.white, 0, 0, 2, 2)],
   "ph-casing": [2, 1, (_, f) => f(PALETTE["amber-500"], 0, 0, 2, 1)],
   "ph-muzzle": [

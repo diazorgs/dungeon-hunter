@@ -7,6 +7,7 @@ import modsJson from "./data/mods.json" with { type: "json" };
 import radioJson from "./data/radio.json" with { type: "json" };
 import runnersJson from "./data/runners.json" with { type: "json" };
 import sectorsJson from "./data/sectors.json" with { type: "json" };
+import vendorJson from "./data/vendor.json" with { type: "json" };
 import weaponsJson from "./data/weapons.json" with { type: "json" };
 import {
   ArmoryItemSchema,
@@ -16,6 +17,7 @@ import {
   RadioLineSchema,
   RunnerSchema,
   SectorConfigSchema,
+  VendorPricesSchema,
   VaultLogSchema,
   WeaponSchema,
 } from "./schemas/content.ts";
@@ -64,3 +66,5 @@ export const STARTER_WEAPON_POOL: WeaponId[] = WEAPON_IDS.filter((id) =>
   ["starter", "common"].includes(WEAPONS[id].rarity),
 );
 export const BASE_MOD_POOL: ModId[] = MOD_IDS.filter((id) => MODS[id].inBasePool);
+
+export const VENDOR_PRICES = VendorPricesSchema.parse(vendorJson);

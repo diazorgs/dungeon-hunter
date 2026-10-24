@@ -56,3 +56,18 @@ test("missing template throws naming the room type and sector", () =>
   expect(() => assignTemplates(layout([room(0, "vendor")]), [], createRng("m"))).toThrow(
     /vendor.*sector 1/,
   ));
+
+test("real catalog: sector 2 and 3 never get another sector's templates", async () => {
+  const { ROOM_CATALOG } = await import("../../content/rooms.ts");
+  const { generateSector } = await import("./generate.ts");
+  for (let i = 0; i < 50; i++)
+    for (const sector of [1, 2, 3] as const) {
+      const layout = assignTemplates(
+        generateSector(`SEED${i}`, sector),
+        ROOM_CATALOG,
+        createRng(`t${i}`),
+      );
+      for (const r of layout.rooms)
+        expect(ROOM_CATALOG.find((t) => t.id === r.templateId)!.sectors).toContain(sector);
+    }
+});

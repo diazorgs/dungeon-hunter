@@ -61,3 +61,10 @@ test("spendScrap is all-or-nothing", () => {
   expect(R.spendScrap(s, 5)).toBe(true);
   expect([s.scrap, s.scrapEarned]).toEqual([0, 5]);
 });
+
+test("a run through all three sectors reports sectorReached 3", () => {
+  const s = R.createRunState(config);
+  R.advanceSector(s);
+  R.advanceSector(s);
+  expect(toRunResult(s).sectorReached).toBe(3);
+});

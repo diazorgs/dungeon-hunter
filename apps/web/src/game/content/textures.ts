@@ -174,6 +174,24 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
       f(PALETTE["amber-300"], 14, 6, 4, 4)
     ),
   ],
+  "ph-hydra-core": [
+    32,
+    32,
+    (_, f) => (
+      f(PALETTE["teal-800"], 2, 2, 28, 28),
+      f(PALETTE["teal-600"], 6, 6, 20, 20),
+      f(PALETTE["bleed-500"], 12, 12, 8, 8)
+    ),
+  ],
+  "ph-hydra-head": [
+    16,
+    16,
+    (_, f) => (
+      f(PALETTE["teal-600"], 1, 1, 14, 14),
+      f(PALETTE["teal-200"], 4, 4, 8, 8),
+      f(PALETTE["bleed-300"], 6, 6, 4, 4)
+    ),
+  ],
   "ph-spark": [2, 2, (_, f) => f(PALETTE.white, 0, 0, 2, 2)],
   "ph-casing": [2, 1, (_, f) => f(PALETTE["amber-500"], 0, 0, 2, 1)],
   "ph-muzzle": [

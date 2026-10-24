@@ -32,7 +32,11 @@ export class AttackScheduler {
 
   setPhase(steps: readonly AttackStep[]): void {
     if (this.current) this.pending = steps;
-    else this.steps = steps;
+    else {
+      // The newest phase wins over any older pending one.
+      this.steps = steps;
+      this.pending = null;
+    }
   }
 
   update(now: number): ScheduleState {
@@ -57,6 +61,11 @@ export class AttackScheduler {
       changed = true;
     }
     return { ...this.current!, changed };
+  }
+
+  /** Drop the current step (its attacker died); the next update starts a fresh one. */
+  cancel(): void {
+    this.current = null;
   }
 
   /** E.g. a charge hit a wall: run → recover now. */

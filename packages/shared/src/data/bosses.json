@@ -38,7 +38,35 @@
     "name": "Conduit Hydra",
     "sector": 2,
     "hp": 750,
-    "phases": []
+    "phases": [
+      {
+        "id": "heads",
+        "untilHpPct": 0,
+        "patterns": ["aimed-shots", "spread", "beam-sweep", "core-pulse", "core-spiral"]
+      }
+    ],
+    "params": {
+      "contactDamage": 1,
+      "headHp": 150,
+      "coreHp": 300,
+      "headRadius": 44,
+      "aimedCount": 5,
+      "aimedGapMs": 120,
+      "aimedSpeed": 110,
+      "spreadVolleys": 3,
+      "spreadCount": 7,
+      "spreadArcDeg": 70,
+      "spreadSpeed": 90,
+      "spreadGapMs": 250,
+      "sweepArcDeg": 120,
+      "sweepLength": 220,
+      "corePulseCount": 20,
+      "corePulseSpeed": 80,
+      "spiralArms": 3,
+      "spiralStepDeg": 12,
+      "spiralGapMs": 100,
+      "spiralSpeed": 80
+    }
   },
   {
     "id": "core-warden",

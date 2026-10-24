@@ -64,3 +64,23 @@ test("endStageEarly moves run to recover", () => {
   s.endStageEarly(160);
   expect(s.update(160)).toMatchObject({ stage: "recover", enteredAt: 160 });
 });
+
+test("cancel drops the current step and applies a pending phase", () => {
+  const s = new AttackScheduler(createRng("c"));
+  s.setPhase([A]);
+  s.update(0);
+  s.setPhase([B]);
+  s.cancel();
+  expect(s.update(10)).toMatchObject({ step: { id: "b" }, stage: "telegraph", enteredAt: 10 });
+});
+
+test("a newer phase set after cancel beats an older pending one", () => {
+  const s = new AttackScheduler(createRng("n"));
+  const C: AttackStep = { ...A, id: "c" };
+  s.setPhase([A]);
+  s.update(0);
+  s.setPhase([B]);
+  s.cancel();
+  s.setPhase([C]);
+  expect(s.update(10).step.id).toBe("c");
+});

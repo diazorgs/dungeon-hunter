@@ -62,6 +62,15 @@ export abstract class Boss extends Phaser.Physics.Arcade.Sprite {
     return [{ id: -1, sprite: this }];
   }
 
+  /** Boss bar max and phase markers; multi-part bosses report the total across parts. */
+  barMaxHp(): number {
+    return this.health.maxHp;
+  }
+
+  barMarkers(): number[] {
+    return this.def.thresholds;
+  }
+
   /** One attack list per phase, matching `def.thresholds` (length + 1). */
   abstract phases(): AttackStep[][];
   protected abstract runStep(s: ScheduleState, now: number, dt: number): void;

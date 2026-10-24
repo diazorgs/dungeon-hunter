@@ -4,6 +4,7 @@ import type Phaser from "phaser";
 import type { Boss } from "../entities/Boss.ts";
 import { Bullet } from "../entities/Bullet.ts";
 import { DummyBoss } from "../entities/bosses/DummyBoss.ts";
+import { ConduitHydra } from "../entities/bosses/ConduitHydra.ts";
 import { Gatekeeper } from "../entities/bosses/Gatekeeper.ts";
 import type { CombatWorld } from "./CombatWorld.ts";
 import type { HitTarget } from "./weapons/targets.ts";
@@ -24,6 +25,16 @@ export const BOSSES_IMPL: Partial<Record<BossId | "dummy", BossFactory>> = {
       x,
       y,
       { id: d.id, name: d.name, hp: d.hp, thresholds, params: d.params },
+      world,
+    );
+  },
+  "conduit-hydra": (scene, x, y, world) => {
+    const d = BOSSES["conduit-hydra"];
+    return new ConduitHydra(
+      scene,
+      x,
+      y,
+      { id: d.id, name: d.name, hp: d.params.coreHp ?? 300, thresholds: [], params: d.params },
       world,
     );
   },
@@ -74,8 +85,8 @@ export class BossSystem {
       boss.invulnerable = false;
       scene.events.emit("boss:spawned", {
         name: boss.def.name,
-        maxHp: boss.health.maxHp,
-        phaseMarkers: boss.def.thresholds,
+        maxHp: boss.barMaxHp(),
+        phaseMarkers: boss.barMarkers(),
       });
     });
     return boss;

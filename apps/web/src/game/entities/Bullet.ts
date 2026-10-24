@@ -13,6 +13,8 @@ export interface BulletOpts {
   stunMs?: number;
   /** Called after this bullet damages a target (chain lightning). */
   onHit?: (b: Bullet, target: HitTarget) => void;
+  /** Who fired it (e.g. a Hydra head), so its shots can be cleared when it dies. */
+  tag?: string;
   /** Called once when the bullet dies for any reason (explosive shells). */
   onDeath?: (b: Bullet) => void;
 }
@@ -31,6 +33,7 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
   /** Guardians already hit by this bullet, so piercing shots hit each target once. */
   readonly hitIds = new Set<number>();
   onHit?: BulletOpts["onHit"];
+  tag?: string;
   private onDeath?: BulletOpts["onDeath"];
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -50,6 +53,7 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
     this.bouncesLeft = opts.bounces ?? 0;
     this.stunMs = opts.stunMs ?? 0;
     this.onHit = opts.onHit;
+    this.tag = opts.tag;
     this.onDeath = opts.onDeath;
     this.body.setBounce(this.bouncesLeft > 0 ? 1 : 0);
     this.dieAt = this.scene.time.now + (opts.lifetimeMs ?? 3000);

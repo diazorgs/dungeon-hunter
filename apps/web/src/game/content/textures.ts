@@ -203,6 +203,15 @@ const PLACEHOLDERS: Record<string, [w: number, h: number, draw: Draw]> = {
       f(PALETTE.scrap, 6, 14, 4, 3)
     ),
   ],
+  "ph-arm": [
+    10,
+    10,
+    (_, f) => (
+      f(PALETTE["steel-600"], 0, 0, 10, 10),
+      f(PALETTE["steel-400"], 1, 1, 8, 3),
+      f(PALETTE["bleed-500"], 4, 5, 2, 3)
+    ),
+  ],
   "ph-spark": [2, 2, (_, f) => f(PALETTE.white, 0, 0, 2, 2)],
   "ph-casing": [2, 1, (_, f) => f(PALETTE["amber-500"], 0, 0, 2, 1)],
   "ph-muzzle": [

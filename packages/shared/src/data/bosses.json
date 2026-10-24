@@ -73,6 +73,39 @@
     "name": "Core Warden",
     "sector": 3,
     "hp": 1200,
-    "phases": []
+    "phases": [
+      {
+        "id": "shielded",
+        "untilHpPct": 0.66,
+        "patterns": ["spiral-2", "arm-sweep"]
+      },
+      {
+        "id": "lockdown",
+        "untilHpPct": 0.33,
+        "patterns": ["spiral-2"]
+      },
+      {
+        "id": "exposed",
+        "untilHpPct": 0,
+        "patterns": ["spiral-4", "core-burst"]
+      }
+    ],
+    "params": {
+      "contactDamage": 1,
+      "armRadius": 28,
+      "armTurnDegPerSec": 45,
+      "armSweepDegPerSec": 270,
+      "spiral2GapMs": 120,
+      "spiral2StepDeg": 14,
+      "spiralSpeed": 75,
+      "spiral4StepDeg": 10,
+      "burstRing": 24,
+      "burstAimed": 5,
+      "burstSpeed": 90,
+      "lockdownBudget": 14,
+      "enrageRing": 32,
+      "enrageEvery": 12,
+      "enrageSpeed": 85
+    }
   }
 ]

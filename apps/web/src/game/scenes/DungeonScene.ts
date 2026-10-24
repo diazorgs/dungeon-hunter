@@ -18,6 +18,7 @@ import type { Loadout } from "../logic/weapons/loadout.ts";
 import { LiftPad } from "../entities/LiftPad.ts";
 import { VendorTerminal } from "../entities/VendorTerminal.ts";
 import { applySectorAtmosphere } from "../systems/visuals/sectorAtmosphere.ts";
+import { playShutdown } from "./ShutdownSequence.ts";
 import { gainEnergy } from "../logic/combat/combatant.ts";
 import { rollVendorStock, tryBuy } from "../logic/vendor.ts";
 import type { VendorItem } from "../logic/vendor.ts";
@@ -151,8 +152,15 @@ export class DungeonScene extends Phaser.Scene {
     );
     this.events.on("boss:dead", (d: { id: BossId }) => {
       onBossKilled(this.run, d.id);
+      // Core Warden: the shutdown cinematic ends the run in victory.
+      if (d.id === "core-warden") {
+        void playShutdown(this, this.world.player, () => (this.input$.blocked = true)).then(() =>
+          this.finish(),
+        );
+        return;
+      }
       const at = sector.spawns.find((sp) => sp.kind === "lift");
-      if (d.id !== "core-warden" && at) this.lift = new LiftPad(this, at.x, at.y);
+      if (at) this.lift = new LiftPad(this, at.x, at.y);
     });
     this.events.on("player:died", () => this.die());
     if (import.meta.env.DEV)

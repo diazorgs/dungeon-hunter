@@ -568,19 +568,20 @@ The palette is exported once as `packages/shared/src/palette.ts` (`PALETTE` as `
 
 ## 15. Decision log
 
-| #   | Decision                                                   | Reason                                                                                |
-| --- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| D1  | Pure logic folder with lint-enforced no-Phaser rule        | Testability; PRD test priorities are all logic                                        |
-| D2  | `ProfileRepository` with local and API implementations     | Lets M5 ship full meta progression offline; M6 swaps the backend                      |
-| D3  | Lift is a scene, not a grid room                           | Boss room must be a dead end; keeps generator simple                                  |
-| D4  | `roomsCleared` counts combat rooms only                    | Makes the server cap (`6 × sector`) exact                                             |
-| D5  | Rejected runs are not stored                               | Leaderboard reads `runs` directly; nothing to filter                                  |
-| D6  | Settings persisted server-side via `PUT /api/me/settings`  | PRD says `saves` stores settings in MVP; the endpoint list lacked it                  |
-| D7  | BitmapText in Phaser, web font in React (same source font) | Canvas text blurs at 480×270                                                          |
-| D8  | One mod pick per sector, at the Lift                       | PRD lists both "after each sector boss" and "Lift"; they are the same moment          |
-| D9  | Internal packages consumed from source                     | No build step in the dev loop; Vite and Wrangler compile TS                           |
-| D11 | Sector transition = scene restart with a carry object      | Restart guarantees every old object and collider is gone; RunState + HP/loadout carry |
-| D10 | Arc Carbine is Common, not Rare                            | PRD promised pistol + 5 commons but listed 4; burst has no signature mechanic         |
+| #   | Decision                                                    | Reason                                                                                  |
+| --- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| D1  | Pure logic folder with lint-enforced no-Phaser rule         | Testability; PRD test priorities are all logic                                          |
+| D2  | `ProfileRepository` with local and API implementations      | Lets M5 ship full meta progression offline; M6 swaps the backend                        |
+| D3  | Lift is a scene, not a grid room                            | Boss room must be a dead end; keeps generator simple                                    |
+| D4  | `roomsCleared` counts combat rooms only                     | Makes the server cap (`6 × sector`) exact                                               |
+| D5  | Rejected runs are not stored                                | Leaderboard reads `runs` directly; nothing to filter                                    |
+| D6  | Settings persisted server-side via `PUT /api/me/settings`   | PRD says `saves` stores settings in MVP; the endpoint list lacked it                    |
+| D7  | BitmapText in Phaser, web font in React (same source font)  | Canvas text blurs at 480×270                                                            |
+| D8  | One mod pick per sector, at the Lift                        | PRD lists both "after each sector boss" and "Lift"; they are the same moment            |
+| D9  | Internal packages consumed from source                      | No build step in the dev loop; Vite and Wrangler compile TS                             |
+| D12 | Gameplay timing uses the scene clock, never tween callbacks | Phaser tweens run on their own real-time clock; hit-stop and pause must freeze gameplay |
+| D11 | Sector transition = scene restart with a carry object       | Restart guarantees every old object and collider is gone; RunState + HP/loadout carry   |
+| D10 | Arc Carbine is Common, not Rare                             | PRD promised pistol + 5 commons but listed 4; burst has no signature mechanic           |
 
 ## 16. Open questions
 

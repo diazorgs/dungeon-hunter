@@ -5,6 +5,7 @@ import type { Boss } from "../entities/Boss.ts";
 import { Bullet } from "../entities/Bullet.ts";
 import { DummyBoss } from "../entities/bosses/DummyBoss.ts";
 import { ConduitHydra } from "../entities/bosses/ConduitHydra.ts";
+import { CoreWarden } from "../entities/bosses/CoreWarden.ts";
 import { Gatekeeper } from "../entities/bosses/Gatekeeper.ts";
 import type { CombatWorld } from "./CombatWorld.ts";
 import type { HitTarget } from "./weapons/targets.ts";
@@ -35,6 +36,17 @@ export const BOSSES_IMPL: Partial<Record<BossId | "dummy", BossFactory>> = {
       x,
       y,
       { id: d.id, name: d.name, hp: d.params.coreHp ?? 300, thresholds: [], params: d.params },
+      world,
+    );
+  },
+  "core-warden": (scene, x, y, world) => {
+    const d = BOSSES["core-warden"];
+    const thresholds = d.phases.slice(0, -1).map((p) => p.untilHpPct);
+    return new CoreWarden(
+      scene,
+      x,
+      y,
+      { id: d.id, name: d.name, hp: d.hp, thresholds, params: d.params },
       world,
     );
   },
